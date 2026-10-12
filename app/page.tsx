@@ -12,9 +12,9 @@ import {
   Headphones,
   MessageCircle,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { SiteShell } from "@/components/vellum/SiteShell";
+import { AtendimentoDemo } from "@/components/vellum/AtendimentoDemo";
 import { carregarPlanosPublicos } from "@/lib/vellum/plans-server";
 import { formatarBRL } from "@/lib/vellum/catalogo";
 
@@ -29,7 +29,7 @@ export default async function HomePage() {
   return (
     <IdiomaProvider locale={locale}>
       <SiteShell>
-        <main id="conteudo">
+        <main id="conteudo" tabIndex={-1}>
           <section className="vellum-hero">
             <div className="vellum-hero-copy">
               <p className="vellum-eyebrow">
@@ -66,63 +66,7 @@ export default async function HomePage() {
                 </span>
               </div>
             </div>
-            <div
-              className="vellum-workflow"
-              aria-label={t("Exemplo ilustrativo de um atendimento, sem dados reais")}
-            >
-              <div className="vellum-workflow-top">
-                <span>
-                  <MessageCircle size={16} aria-hidden /> {t(" REGISTRO DE ATENDIMENTO")}
-                </span>
-                <small>{t("EXEMPLO ILUSTRATIVO")}</small>
-              </div>
-              <div className="vellum-workflow-contact">
-                <div className="vellum-avatar">{t("MC")}</div>
-                <div>
-                  <strong>{t("Marina Costa")}</strong>
-                  <span>{t("Interesse em consultoria")}</span>
-                </div>
-                <span className="vellum-pill">{t("Novo contato")}</span>
-              </div>
-              <div className="vellum-message inbound">
-                <small>{t("MARINA")}</small>
-                <p>{t("Olá! Quero entender como funciona a consultoria para a minha empresa.")}</p>
-              </div>
-              <div className="vellum-message outbound">
-                <small>
-                  <Sparkles size={12} aria-hidden /> {t(" AGENTE VÉLLUM")}
-                </small>
-                <p>
-                  {t("Olá, Marina. Me conta: qual é o principal desafio do seu atendimento hoje?")}
-                </p>
-              </div>
-              <div className="vellum-message inbound last">
-                <small>{t("MARINA")}</small>
-                <p>{t("A gente recebe os contatos, mas perde o acompanhamento depois.")}</p>
-              </div>
-              <div className="vellum-record">
-                <span>
-                  <Check size={14} aria-hidden />
-                </span>
-                <div>
-                  <strong>{t("Contexto registrado. Próximo passo definido.")}</strong>
-                  <p>{t("Lead qualificado → conversa com o especialista")}</p>
-                </div>
-              </div>
-              <div className="vellum-workflow-bottom">
-                <GitBranch size={15} aria-hidden />
-                <span>{t("Contato")}</span>
-                <ArrowRight size={13} aria-hidden />
-                <span>{t("Qualificação")}</span>
-                <ArrowRight size={13} aria-hidden />
-                <strong>{t("Próximo passo")}</strong>
-              </div>
-              <div className="vellum-workflow-stamp">
-                {t("CONTEXTO")}
-                <br />
-                <strong>{t("PRESERVADO.")}</strong>
-              </div>
-            </div>
+            <AtendimentoDemo />
           </section>
           <div className="vellum-ribbon">
             <span>{t("DO PRIMEIRO “OLÁ” AO PRÓXIMO PASSO.")}</span>
@@ -177,14 +121,68 @@ export default async function HomePage() {
                     "Retornos programados, consentimento e interrupção quando o cliente responde, pede para sair ou conclui a conversão.",
                   ),
                 },
-              ].map(({ icon: Icon, title, copy }) => (
+              ].map(({ icon: Icon, title, copy }, i) => (
                 <article key={title}>
-                  <Icon size={25} strokeWidth={1.4} aria-hidden />
+                  <div className="vellum-feature-heading">
+                    <Icon size={24} strokeWidth={1.5} aria-hidden />
+                    <span aria-hidden>{String(i + 1).padStart(2, "0")}</span>
+                  </div>
                   <h3>{title}</h3>
                   <p>{copy}</p>
                 </article>
               ))}
             </div>
+          </section>
+          <section className="vellum-method" aria-labelledby="metodo-titulo">
+            <div className="vellum-section-intro">
+              <p className="vellum-eyebrow">{t("DO CONHECIMENTO À CONVERSA.")}</p>
+              <h2 id="metodo-titulo">
+                {t("Sua operação,")}
+                <br />
+                <em>{t("passo a passo.")}</em>
+              </h2>
+              <p>
+                {t(
+                  "Prepare a base, defina o atendimento e acompanhe o que acontece. Cada etapa tem seu lugar.",
+                )}
+              </p>
+            </div>
+            <ol>
+              {[
+                {
+                  titulo: t("Organize o conhecimento"),
+                  texto: t(
+                    "Cadastre as informações que o agente pode usar: serviços, dúvidas frequentes e orientações comerciais.",
+                  ),
+                  icon: BookOpen,
+                },
+                {
+                  titulo: t("Defina como atender"),
+                  texto: t(
+                    "Configure o agente e o canal. Revise as perguntas e teste o comportamento antes de ativar.",
+                  ),
+                  icon: MessageCircle,
+                },
+                {
+                  titulo: t("Acompanhe e ajuste"),
+                  texto: t(
+                    "Veja as conversas e o funil, assuma quando necessário e refine a operação com o seu time.",
+                  ),
+                  icon: GitBranch,
+                },
+              ].map(({ titulo, texto, icon: Icon }, i) => (
+                <li key={titulo}>
+                  <span className="vellum-method-number" aria-hidden>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3>{titulo}</h3>
+                    <p>{texto}</p>
+                  </div>
+                  <Icon size={22} aria-hidden />
+                </li>
+              ))}
+            </ol>
           </section>
           <section className="vellum-control">
             <div>
@@ -252,6 +250,11 @@ export default async function HomePage() {
               {t("Conhecer os planos ")}
               <ArrowRight size={17} aria-hidden />
             </Link>
+            <p className="vellum-start-note">
+              {t(
+                "Criar sua conta não gera cobrança. Consulte os planos e as condições antes de contratar.",
+              )}
+            </p>
           </section>
         </main>
       </SiteShell>

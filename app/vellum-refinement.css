@@ -1,0 +1,866 @@
+/* Fachada editorial e acabamento das cascas. O painel conserva os tokens
+   semânticos, o tema e a marca resolvida de cada instalação/empresa. */
+.vellum-site {
+  --v-paper: #fffdf8;
+  --v-soft: #eae6dc;
+}
+.vellum-site button {
+  cursor: pointer;
+  font: inherit;
+}
+.vellum-site :is(a, button, summary) {
+  touch-action: manipulation;
+}
+.vellum-site button:focus-visible {
+  outline: 3px solid var(--v-red);
+  outline-offset: 4px;
+}
+.vellum-site :is(section[id], main[id]) {
+  scroll-margin-top: 100px;
+}
+.vellum-header {
+  min-height: 88px;
+  padding-block: 18px;
+}
+.vellum-header nav {
+  font-size: 14px;
+}
+.vellum-header nav > a:not(.vellum-button) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+.vellum-header nav [aria-current="page"] {
+  color: var(--v-red);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+.vellum-button {
+  font-size: 14px;
+  border-radius: 6px;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+.vellum-button:hover {
+  transform: none;
+  box-shadow: 0 4px 12px #9e2b2515;
+}
+.vellum-button:active {
+  background: #6f1d19;
+  box-shadow: none;
+}
+.vellum-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 1.1px;
+  margin-bottom: 22px;
+}
+.vellum-hero {
+  grid-template-columns: 0.95fr 1.1fr;
+  padding-block: 72px 82px;
+  gap: 52px;
+}
+.vellum-hero h1 {
+  font-size: clamp(50px, 5.05vw, 74px);
+  line-height: 1.04;
+}
+.vellum-lead {
+  font-size: 16px;
+  line-height: 1.75;
+  max-width: 440px;
+}
+.vellum-text-link {
+  font-size: 13px;
+}
+.vellum-hero-proof {
+  font-size: 11px;
+  gap: 14px 20px;
+  line-height: 1.6;
+}
+.vellum-demo {
+  min-width: 0;
+  border: 1px solid #cdd1d0;
+  border-radius: 12px;
+  background: var(--v-paper);
+  box-shadow:
+    0 22px 60px #0c1f3310,
+    0 3px 9px #0c1f3305;
+}
+.vellum-demo-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--v-line);
+}
+.vellum-demo-caption > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.25px;
+}
+.vellum-demo-caption small {
+  font-size: 9px;
+  letter-spacing: 0.3px;
+  color: var(--v-muted);
+}
+.vellum-demo-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 10px;
+  border-bottom: 1px solid var(--v-line);
+  background: #f7f4ed;
+}
+.vellum-demo-steps button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--v-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  transition:
+    color 150ms,
+    background 150ms;
+}
+.vellum-demo-steps button > span {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+}
+.vellum-demo-steps button:hover {
+  background: #eae6dc;
+  color: var(--v-navy);
+}
+.vellum-demo-steps button[aria-pressed="true"] {
+  background: var(--v-navy);
+  color: var(--v-cream);
+  border-color: var(--v-navy);
+}
+.vellum-demo-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+}
+.vellum-demo-conversation {
+  min-width: 0;
+  border-right: 1px solid var(--v-line);
+}
+.vellum-demo-contact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+}
+.vellum-demo-contact > div {
+  min-width: 0;
+  flex: 1;
+}
+.vellum-demo-contact strong {
+  display: block;
+  font-size: 13px;
+}
+.vellum-demo-contact div > span {
+  display: block;
+  color: var(--v-muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+.vellum-demo-contact > svg {
+  color: var(--v-muted);
+}
+.vellum-demo-messages {
+  min-height: 246px;
+  padding: 0 16px 20px;
+}
+.vellum-demo-message {
+  padding: 14px;
+  background: #efeee8;
+  border-radius: 3px 10px 10px 10px;
+  font-size: 13px;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.vellum-demo-message small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  color: var(--v-muted);
+}
+.vellum-demo-message p {
+  margin: 0;
+}
+.vellum-demo-message.outbound {
+  background: #eaf0f4;
+  border-radius: 10px 3px 10px 10px;
+  margin-left: 16px;
+  margin-bottom: 0;
+}
+.vellum-demo-message.outbound small {
+  color: var(--v-navy);
+}
+.vellum-demo-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px dashed var(--v-line);
+  color: var(--v-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.vellum-demo-context {
+  min-width: 0;
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  background: #f9f7f0;
+}
+.vellum-demo-context-label {
+  color: var(--v-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+.vellum-demo-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  margin: 18px 0;
+  padding: 6px 8px;
+  border: 1px solid #d9d3ca;
+  border-radius: 4px;
+  color: var(--v-red);
+  font-size: 10px;
+  line-height: 1.4;
+}
+.vellum-demo-context > strong {
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.45;
+}
+.vellum-demo-context > p {
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--v-muted);
+  margin: 10px 0 22px;
+}
+.vellum-demo-next {
+  margin-top: auto;
+  border-top: 1px solid var(--v-line);
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.vellum-demo-next > span {
+  grid-column: 1 / -1;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  color: var(--v-muted);
+}
+.vellum-demo-next > strong {
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 550;
+}
+.vellum-demo-next > svg {
+  color: var(--v-red);
+}
+.vellum-demo-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--v-line);
+  padding: 14px 20px;
+  font-size: 11px;
+  color: var(--v-muted);
+}
+.vellum-demo-footer > svg {
+  color: var(--v-red);
+}
+.vellum-demo-footer > span:last-child {
+  font-family: var(--font-display), serif;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--v-red);
+  margin-left: auto;
+}
+.vellum-ribbon {
+  padding-block: 26px;
+}
+.vellum-ribbon > span {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.vellum-operation {
+  padding-block: 90px;
+  gap: 72px;
+}
+.vellum-section-intro h2,
+.vellum-control h2 {
+  font-size: clamp(36px, 3.6vw, 50px);
+}
+.vellum-section-intro > p:last-child {
+  max-width: 370px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.vellum-features {
+  gap: 32px;
+}
+.vellum-features article {
+  border-top: 1px solid var(--v-line);
+  padding-top: 20px;
+}
+.vellum-feature-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  color: var(--v-red);
+}
+.vellum-feature-heading > span {
+  color: var(--v-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+}
+.vellum-features h3 {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.vellum-features p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.vellum-method {
+  max-width: 1320px;
+  padding: 0 44px 88px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 0.85fr 1.3fr;
+  gap: 72px;
+}
+.vellum-method ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vellum-method li {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px 0;
+  border-top: 1px solid var(--v-line);
+}
+.vellum-method li:last-child {
+  border-bottom: 1px solid var(--v-line);
+}
+.vellum-method-number {
+  color: var(--v-red);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  padding-top: 3px;
+}
+.vellum-method li > div {
+  flex: 1;
+}
+.vellum-method li > svg {
+  color: var(--v-muted);
+  margin-top: 3px;
+}
+.vellum-method h3 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.vellum-method li p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--v-muted);
+  line-height: 1.8;
+  max-width: 470px;
+}
+.vellum-control {
+  border-radius: 10px;
+  padding: 52px;
+  gap: 64px;
+}
+.vellum-control > div > p:not(.vellum-eyebrow) {
+  font-size: 15px;
+}
+.vellum-control ul {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.vellum-control li {
+  align-items: flex-start;
+}
+.vellum-control li svg {
+  margin-top: 3px;
+}
+.vellum-start {
+  padding-block: 16px 84px;
+}
+.vellum-start p:not(.vellum-eyebrow) {
+  font-size: 15px;
+}
+.vellum-start .vellum-start-note {
+  max-width: 390px;
+  margin: 20px auto 0;
+  font-size: 12px !important;
+  line-height: 1.7;
+}
+.vellum-footer-links {
+  gap: 10px 26px;
+  flex-wrap: wrap;
+  max-width: 560px;
+  font-size: 12px;
+}
+.vellum-footer-links a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.vellum-footer-links a:hover {
+  color: var(--v-red);
+}
+.vellum-footer > div > p {
+  font-size: 12px;
+}
+.vellum-plan {
+  border-radius: 10px;
+  padding: 30px 22px 24px;
+}
+.vellum-plan > p {
+  font-size: 13px;
+}
+.vellum-plan h3 {
+  font-size: 12px;
+}
+.vellum-plan ul {
+  font-size: 12px;
+}
+.vellum-plan-limit {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.vellum-plan-label {
+  font-size: 11px;
+}
+.vellum-plan .vellum-button {
+  font-size: 12px;
+}
+.vellum-faq summary {
+  min-height: 44px;
+  display: list-item;
+  padding-block: 8px;
+}
+.vellum-menu-trigger {
+  display: none;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--v-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--v-navy);
+}
+.vellum-mobile-nav {
+  padding: 32px 24px;
+  width: min(360px, 90vw);
+  min-height: 100dvh;
+}
+.vellum-mobile-nav > button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  top: 18px;
+  right: 14px;
+}
+.vellum-mobile-nav nav {
+  display: grid;
+  gap: 12px;
+  margin-top: 44px;
+}
+.vellum-mobile-nav nav a {
+  padding: 14px 12px;
+  font-size: 16px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--v-line);
+}
+.vellum-mobile-nav nav .vellum-button {
+  margin-top: 16px;
+  border-bottom-color: var(--v-red);
+}
+.vellum-mobile-nav > p {
+  margin-top: 36px;
+  color: var(--v-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* Administração e operação da empresa: mesma régua, escopos distintos. */
+.vellum-platform-mode {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+.vellum-admin-shell,
+.vellum-workspace-shell {
+  background: var(--color-bg);
+}
+.vellum-panel-skip {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  transform: translateY(-180%);
+  padding: 12px 18px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 6px;
+}
+.vellum-panel-skip:focus {
+  transform: none;
+}
+.vellum-admin-main {
+  scroll-margin-top: 116px;
+}
+.vellum-admin-main h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+.vellum-admin-sidebar nav a[aria-current="page"] {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+.vellum-admin-sidebar a {
+  outline-offset: 3px;
+}
+.vellum-admin-sidebar a:focus-visible {
+  outline: 2px solid var(--ring);
+}
+.vellum-admin-welcome {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--card));
+}
+.vellum-admin-welcome-icon {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  color: var(--primary);
+  background: var(--card);
+}
+.vellum-admin-welcome > div {
+  flex: 1;
+  min-width: 200px;
+}
+.vellum-admin-welcome h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 25px;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.vellum-admin-welcome p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  max-width: 540px;
+}
+.vellum-kpi {
+  box-shadow: none;
+}
+.vellum-admin-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.vellum-admin-shortcuts a {
+  position: relative;
+  display: block;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  transition:
+    border-color 150ms,
+    background 150ms;
+}
+.vellum-admin-shortcuts a:hover {
+  background: color-mix(in srgb, var(--primary) 3%, var(--card));
+  border-color: var(--primary);
+}
+.vellum-admin-shortcuts a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+.vellum-admin-shortcuts a > svg:first-child {
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+.vellum-admin-shortcuts h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding-right: 24px;
+}
+.vellum-admin-shortcuts p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  max-width: 300px;
+}
+.vellum-admin-shortcuts a > svg:last-child {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  color: var(--muted-foreground);
+}
+.vellum-workspace-shell aside nav a[aria-current="page"] {
+  box-shadow: inset 3px 0 0 var(--primary);
+  background: color-mix(in srgb, var(--primary) 9%, var(--card));
+  color: var(--foreground);
+  font-weight: 500;
+}
+.vellum-workspace-shell aside nav a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1150px) {
+  .vellum-hero {
+    gap: 30px;
+  }
+  .vellum-demo-caption {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 8px;
+  }
+  .vellum-demo-body {
+    grid-template-columns: 1fr;
+  }
+  .vellum-demo-conversation {
+    border-right: 0;
+  }
+  .vellum-demo-messages {
+    min-height: 210px;
+  }
+  .vellum-demo-context {
+    border-top: 1px solid var(--v-line);
+    padding: 18px;
+  }
+  .vellum-demo-context > p {
+    margin-bottom: 12px;
+  }
+  .vellum-demo-context-label {
+    display: none;
+  }
+  .vellum-demo-status {
+    margin: 0 0 12px;
+  }
+  .vellum-demo-next {
+    padding-top: 12px;
+  }
+  .vellum-operation,
+  .vellum-method {
+    gap: 48px;
+  }
+}
+@media (max-width: 960px) {
+  .vellum-hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 52px 32px 60px;
+  }
+  .vellum-hero h1 {
+    font-size: clamp(50px, 7.5vw, 72px);
+  }
+  .vellum-lead {
+    max-width: 580px;
+  }
+  .vellum-demo {
+    width: 100%;
+    max-width: 680px;
+    justify-self: center;
+  }
+  .vellum-demo-body {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  }
+  .vellum-demo-conversation {
+    border-right: 1px solid var(--v-line);
+  }
+  .vellum-demo-context {
+    border-top: 0;
+    padding: 22px 18px;
+  }
+  .vellum-demo-context-label {
+    display: block;
+  }
+  .vellum-demo-status {
+    margin: 18px 0;
+  }
+  .vellum-demo-messages {
+    min-height: 236px;
+  }
+  .vellum-control {
+    margin-inline: 32px;
+    padding: 36px;
+    gap: 36px;
+  }
+}
+@media (max-width: 880px) {
+  .vellum-header .vellum-desktop-nav {
+    display: none;
+  }
+  .vellum-menu-trigger {
+    display: inline-flex;
+  }
+}
+@media (max-width: 760px) {
+  .vellum-header {
+    padding: 16px 24px;
+    min-height: 80px;
+  }
+  .vellum-header .vellum-desktop-nav {
+    display: none;
+  }
+  .vellum-menu-trigger {
+    display: inline-flex;
+  }
+  .vellum-hero {
+    padding: 40px 24px 52px;
+  }
+  .vellum-hero h1 {
+    font-size: clamp(46px, 9.5vw, 66px);
+  }
+  .vellum-lead {
+    font-size: 16px;
+  }
+  .vellum-hero-proof {
+    font-size: 11px;
+  }
+  .vellum-ribbon {
+    padding: 24px;
+  }
+  .vellum-ribbon > div {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .vellum-operation,
+  .vellum-method {
+    grid-template-columns: 1fr;
+    padding: 56px 24px;
+    gap: 28px;
+  }
+  .vellum-method {
+    padding-top: 0;
+  }
+  .vellum-features {
+    gap: 28px 24px;
+  }
+  .vellum-control {
+    margin: 0 24px 56px;
+    padding: 32px 24px;
+    gap: 12px;
+  }
+  .vellum-start {
+    padding: 0 24px 56px;
+  }
+  .vellum-pricing {
+    padding: 44px 24px 56px;
+  }
+  .vellum-admin-shortcuts {
+    grid-template-columns: 1fr;
+  }
+  .vellum-admin-shortcuts a {
+    padding: 20px;
+  }
+  .vellum-admin-welcome {
+    padding: 24px;
+    gap: 16px;
+  }
+  .vellum-admin-welcome > div {
+    min-width: 0;
+    flex-basis: calc(100% - 80px);
+  }
+}
+@media (max-width: 520px) {
+  .vellum-demo-caption {
+    padding: 16px;
+  }
+  .vellum-demo-body {
+    grid-template-columns: 1fr;
+  }
+  .vellum-demo-conversation {
+    border-right: 0;
+  }
+  .vellum-demo-context {
+    border-top: 1px solid var(--v-line);
+  }
+  .vellum-demo-context-label {
+    display: none;
+  }
+  .vellum-demo-status {
+    margin: 0 0 12px;
+  }
+  .vellum-demo-messages {
+    min-height: 220px;
+  }
+  .vellum-demo-steps button {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .vellum-features {
+    grid-template-columns: 1fr;
+  }
+  .vellum-features article {
+    padding-top: 20px;
+  }
+  .vellum-method li {
+    gap: 14px;
+  }
+  .vellum-footer-links {
+    gap: 4px 24px;
+  }
+  .vellum-admin-welcome > div {
+    flex-basis: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vellum-site *,
+  .vellum-admin-shell *,
+  .vellum-workspace-shell *,
+  .vellum-mobile-nav * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

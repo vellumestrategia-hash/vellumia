@@ -15,7 +15,9 @@ const resultados = [];
 try {
   for (const viewport of [
     { width: 1440, height: 1000 },
-    { width: 390, height: 844 },
+    { width: 375, height: 812 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
   ]) {
     const context = await browser.newContext({ viewport, reducedMotion: "reduce" });
     const page = await context.newPage();
@@ -31,6 +33,14 @@ try {
       "Landing sem overflow horizontal",
     );
     await page.screenshot({ path: `${out}/landing-${viewport.width}.png`, fullPage: true });
+    await page.getByRole("button", { name: /Qualificar/ }).click();
+    assert.equal(
+      await page.getByRole("button", { name: /Qualificar/ }).getAttribute("aria-pressed"),
+      "true",
+    );
+    await page.getByText("Desafio: acompanhamento dos contatos", { exact: true }).waitFor();
+    await page.getByRole("button", { name: /Passar ao time/ }).click();
+    await page.getByText("Conversa com o especialista", { exact: true }).waitFor();
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
@@ -43,6 +53,26 @@ try {
       [],
       "Acessibilidade da landing",
     );
+    if (viewport.width <= 880) {
+      const abrirMenu = page.getByRole("button", { name: "Abrir menu de navegação" });
+      await abrirMenu.click();
+      await page.getByRole("dialog", { name: "Menu de navegação" }).waitFor();
+      const axeMenu = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze();
+      assert.deepEqual(
+        axeMenu.violations.map((v) => ({ id: v.id, targets: v.nodes.map((n) => n.target) })),
+        [],
+        "Acessibilidade do menu móvel",
+      );
+      await page.keyboard.press("Escape");
+      assert.equal(
+        await abrirMenu.evaluate((el) => el === document.activeElement),
+        true,
+        "Escape devolve o foco ao menu",
+      );
+      await abrirMenu.click();
+    }
     await page.getByRole("link", { name: "Planos", exact: true }).click();
     await page.waitForURL("**/precos", { timeout: 120000 });
     await page.getByRole("heading", { level: 1 }).waitFor();
@@ -116,6 +146,8 @@ try {
       axe_precos: 0,
       axe_login: 0,
       axe_cadastro: 0,
+      demonstracao: "3 etapas acessíveis",
+      menu_mobile: viewport.width <= 880 ? "Escape, foco e navegação aprovados" : "não aplicável",
     });
     await context.close();
   }

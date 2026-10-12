@@ -26,35 +26,50 @@ interface NavItem {
   icon: PhosphorIcon;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: Gauge },
-  { href: "/admin/inbox", label: "Inbox", icon: ChatsCircle },
-  { href: "/admin/tenants", label: "Tenants", icon: Buildings },
-  { href: "/admin/audit", label: "Audit", icon: ClipboardText },
-  { href: "/admin/lgpd", label: "LGPD", icon: Scales },
-  { href: "/admin/incidents", label: "Incidents", icon: Warning },
-  { href: "/admin/usage", label: "Usage", icon: ChartBar },
-  { href: "/admin/billing", label: "Planos e assinaturas", icon: ChartBar },
-  { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/platform-admins", label: "Platform Admins", icon: ShieldCheck },
-  // A porta da tela de marca. Ela NÃO entra em `lib/navigation/registry.ts`:
-  // aquele registro descreve a navegação do tenant (`app/app/**`) e o teste de
-  // completude que o vigia varre só aquela raiz. O admin de plataforma tem
-  // navegação própria, e é esta lista.
-  { href: "/admin/marca", label: "Marca", icon: Palette },
-  // A porta da tela do app OAuth do Google — mesma razão da de cima: é
-  // configuração da INSTALAÇÃO, e /admin tem navegação própria.
-  { href: "/admin/google", label: "Google Agenda", icon: CalendarBlank },
+// Navegação da plataforma; o registry do /app descreve somente as empresas.
+const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
+  {
+    label: "Operação",
+    items: [
+      { href: "/admin/dashboard", label: "Visão geral", icon: Gauge },
+      { href: "/admin/tenants", label: "Empresas", icon: Buildings },
+      { href: "/admin/inbox", label: "Conversas", icon: ChatsCircle },
+      { href: "/admin/billing", label: "Planos e assinaturas", icon: ChartBar },
+      { href: "/admin/usage", label: "Consumo de IA", icon: ChartBar },
+    ],
+  },
+  {
+    label: "Governança",
+    items: [
+      { href: "/admin/users", label: "Usuários", icon: Users },
+      { href: "/admin/platform-admins", label: "Administradores", icon: ShieldCheck },
+      { href: "/admin/audit", label: "Auditoria", icon: ClipboardText },
+      { href: "/admin/lgpd", label: "LGPD", icon: Scales },
+      { href: "/admin/incidents", label: "Incidentes", icon: Warning },
+    ],
+  },
+  {
+    label: "Configuração",
+    items: [
+      { href: "/admin/marca", label: "Marca", icon: Palette },
+      { href: "/admin/google", label: "Google Agenda", icon: CalendarBlank },
+    ],
+  },
 ];
 
 interface AdminSidebarProps {
   userEmail: string;
+  hasCompanyWorkspace?: boolean;
   /** "mobile" = conteúdo desta MESMA navegação dentro do drawer que `AdminShell`
    * abre abaixo de `lg` — mesmo padrão de `components/shell/Sidebar.tsx`. */
   variant?: "desktop" | "mobile";
 }
 
-export function AdminSidebar({ userEmail, variant = "desktop" }: AdminSidebarProps) {
+export function AdminSidebar({
+  userEmail,
+  hasCompanyWorkspace = false,
+  variant = "desktop",
+}: AdminSidebarProps) {
   const t = useT();
   const isMobile = variant === "mobile";
   const pathname = usePathname();
@@ -68,49 +83,74 @@ export function AdminSidebar({ userEmail, variant = "desktop" }: AdminSidebarPro
   return (
     <aside
       className={cn(
-        "flex flex-col border-r bg-card",
-        isMobile ? "h-full w-full" : "hidden w-60 shrink-0 lg:flex",
+        "vellum-admin-sidebar flex flex-col border-r bg-card",
+        isMobile
+          ? "h-full w-full"
+          : "sticky top-11 hidden h-[calc(100dvh-2.75rem)] w-60 shrink-0 lg:flex",
       )}
     >
-      <div className="flex h-14 items-center border-b px-4">
-        <div className="flex flex-col">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">
-            {marca.name}
+      <div className="flex min-h-16 shrink-0 items-center gap-3 border-b px-5">
+        {marca.logoUrl ? (
+          // URL de marca resolvida em runtime, incluindo instalações com logo próprio.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={marca.logoUrl} alt="" className="size-9 shrink-0 object-contain" />
+        ) : (
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-lg font-semibold text-primary-foreground"
+            aria-hidden
+          >
+            {marca.initial}
           </span>
-          <span className="text-sm font-semibold tracking-tight">{t("Admin Plataforma")}</span>
+        )}
+        <div className="flex flex-col">
+          <span className="text-base font-semibold tracking-tight">{marca.name}</span>
+          <span className="text-xs text-muted-foreground">{t("Administração")}</span>
         </div>
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto p-2" aria-label={t("Navegação plataforma")}>
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                isActive
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
-              )}
-            >
-              <Icon size={18} weight={isActive ? "fill" : "regular"} aria-hidden />
-              <span className="truncate">{t(item.label)}</span>
-            </Link>
-          );
-        })}
+      <nav
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4"
+        aria-label={t("Navegação plataforma")}
+      >
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            <p className="mb-2 px-3 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+              {t(group.label)}
+            </p>
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-10 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                      isActive
+                        ? "bg-primary/10 font-medium text-primary"
+                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
+                    )}
+                  >
+                    <Icon size={18} weight={isActive ? "fill" : "regular"} aria-hidden />
+                    <span className="truncate">{t(item.label)}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
-      <div className="space-y-2 border-t p-3">
-        <Link
-          href="/app"
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-        >
-          <ArrowRight size={14} aria-hidden />
-          <span>{t("Voltar pra app")}</span>
-        </Link>
+      <div className="shrink-0 space-y-2 border-t p-3">
+        {hasCompanyWorkspace && (
+          <Link
+            href="/app"
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+          >
+            <ArrowRight size={14} aria-hidden />
+            <span>{t("Área da minha empresa")}</span>
+          </Link>
+        )}
         <p className="truncate px-2 text-xs text-muted-foreground" title={userEmail}>
           {userEmail}
         </p>

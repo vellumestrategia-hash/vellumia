@@ -1,5 +1,127 @@
 /** Textos públicos e financeiros da distribuição Véllum; pt-BR preserva a chave. */
 export const DICIONARIO_VELLUM = {
+  Empresas: { es: "Empresas" },
+  Auditoria: { es: "Auditoría" },
+  Qualificar: { es: "Calificar" },
+  "Atendimento humano": { es: "Atención humana" },
+  Administradores: { es: "Administradores" },
+  Incidentes: { es: "Incidentes" },
+  Operação: { es: "Operación" },
+  Configuração: { es: "Configuración" },
+  Atender: { es: "Atender" },
+  "Passar ao time": { es: "Transferir al equipo" },
+  "Em atendimento": { es: "En atención" },
+  "Em qualificação": { es: "En calificación" },
+  "Entendi. Quem acompanha esses contatos hoje e como vocês organizam os retornos?": {
+    es: "Entiendo. ¿Quién sigue estos contactos hoy y cómo organizan los seguimientos?",
+  },
+  "Quero conversar com alguém sobre a nossa operação.": {
+    es: "Quiero hablar con alguien sobre nuestra operación.",
+  },
+  "Vou encaminhar para o time com o que conversamos. Assim, vocês continuam de onde pararam.": {
+    es: "Lo enviaré al equipo con lo que conversamos. Así pueden continuar desde donde quedaron.",
+  },
+  "Base de conhecimento da empresa": { es: "Base de conocimiento de la empresa" },
+  "O agente consulta o conhecimento cadastrado para orientar a conversa.": {
+    es: "El agente consulta el conocimiento registrado para orientar la conversación.",
+  },
+  "Entender a necessidade": { es: "Comprender la necesidad" },
+  "Perguntas de qualificação": { es: "Preguntas de calificación" },
+  "Desafio: acompanhamento dos contatos": { es: "Desafío: seguimiento de los contactos" },
+  "As respostas ajudam a organizar o contato e o próximo passo no funil.": {
+    es: "Las respuestas ayudan a organizar el contacto y el siguiente paso en el embudo.",
+  },
+  "Registrar o contexto comercial": { es: "Registrar el contexto comercial" },
+  "Histórico compartilhado com o time": { es: "Historial compartido con el equipo" },
+  "Uma pessoa assume com o histórico e a necessidade do contato disponíveis.": {
+    es: "Una persona asume con el historial y la necesidad del contacto disponibles.",
+  },
+  "Conversa com o especialista": { es: "Conversación con el especialista" },
+  "DA CONVERSA À OPERAÇÃO": { es: "DE LA CONVERSACIÓN A LA OPERACIÓN" },
+  "Explorar etapas do atendimento": { es: "Explorar etapas de atención" },
+  "CONTEXTO DO CONTATO": { es: "CONTEXTO DEL CONTACTO" },
+  "PRÓXIMO PASSO": { es: "SIGUIENTE PASO" },
+  "IA e pessoas, com o mesmo contexto.": { es: "IA y personas, con el mismo contexto." },
+  "DO CONHECIMENTO À CONVERSA.": { es: "DEL CONOCIMIENTO A LA CONVERSACIÓN." },
+  "Sua operação,": { es: "Tu operación," },
+  "passo a passo.": { es: "paso a paso." },
+  "Prepare a base, defina o atendimento e acompanhe o que acontece. Cada etapa tem seu lugar.": {
+    es: "Prepara la base, define la atención y sigue lo que sucede. Cada etapa tiene su lugar.",
+  },
+  "Organize o conhecimento": { es: "Organiza el conocimiento" },
+  "Cadastre as informações que o agente pode usar: serviços, dúvidas frequentes e orientações comerciais.":
+    {
+      es: "Registra la información que el agente puede usar: servicios, preguntas frecuentes y orientaciones comerciales.",
+    },
+  "Defina como atender": { es: "Define cómo atender" },
+  "Configure o agente e o canal. Revise as perguntas e teste o comportamento antes de ativar.": {
+    es: "Configura el agente y el canal. Revisa las preguntas y prueba el comportamiento antes de activarlo.",
+  },
+  "Acompanhe e ajuste": { es: "Supervisa y ajusta" },
+  "Veja as conversas e o funil, assuma quando necessário e refine a operação com o seu time.": {
+    es: "Revisa las conversaciones y el embudo, intervén cuando sea necesario y ajusta la operación con tu equipo.",
+  },
+  "Criar sua conta não gera cobrança. Consulte os planos e as condições antes de contratar.": {
+    es: "Crear tu cuenta no genera un cobro. Consulta los planes y las condiciones antes de contratar.",
+  },
+  "Conheça a plataforma, consulte os planos ou acesse sua conta.": {
+    es: "Conoce la plataforma, consulta los planes o accede a tu cuenta.",
+  },
+  "Administração da plataforma": { es: "Administración de la plataforma" },
+  "Menu do administrador": { es: "Menú del administrador" },
+  "Administrador da plataforma": { es: "Administrador de la plataforma" },
+  "Saindo…": { es: "Cerrando sesión…" },
+  Governança: { es: "Gobernanza" },
+  "Consumo de IA": { es: "Consumo de IA" },
+  Administração: { es: "Administración" },
+  "Área da minha empresa": { es: "Área de mi empresa" },
+  "Administração de todas as empresas": { es: "Administración de todas las empresas" },
+  "Ver site": { es: "Ver sitio" },
+  "ADMINISTRAÇÃO DA PLATAFORMA": { es: "ADMINISTRACIÓN DE LA PLATAFORMA" },
+  "Acompanhe as empresas, o atendimento e os pontos que precisam da sua atenção.": {
+    es: "Supervisa las empresas, la atención y los puntos que necesitan tu atención.",
+  },
+  "Não foi possível atualizar a visão geral.": { es: "No se pudo actualizar la vista general." },
+  "Os últimos dados disponíveis continuam abaixo. Tente atualizar novamente.": {
+    es: "Los últimos datos disponibles siguen abajo. Intenta actualizar nuevamente.",
+  },
+  "Verifique sua conexão e tente atualizar novamente.": {
+    es: "Comprueba tu conexión e intenta actualizar nuevamente.",
+  },
+  "Carregando visão geral": { es: "Cargando vista general" },
+  "Panorama da operação": { es: "Panorama de la operación" },
+  "Última atualização: ": { es: "Última actualización: " },
+  " · Atualização automática a cada 30 s": { es: " · Actualización automática cada 30 s" },
+  "Sua plataforma começa pelas empresas.": { es: "Tu plataforma comienza con las empresas." },
+  "Nenhuma empresa ativa no momento. Cadastre uma empresa cliente ou revise os cadastros existentes para começar a operação.":
+    {
+      es: "No hay empresas activas en este momento. Registra una empresa cliente o revisa los registros existentes para comenzar la operación.",
+    },
+  "Gerenciar empresas": { es: "Administrar empresas" },
+  "Pontos de atenção": { es: "Puntos de atención" },
+  "Acessos rápidos": { es: "Accesos rápidos" },
+  "Cadastros, acesso e acompanhamento das empresas clientes.": {
+    es: "Registros, acceso y seguimiento de las empresas clientes.",
+  },
+  "Catálogo de planos e condições comerciais da plataforma.": {
+    es: "Catálogo de planes y condiciones comerciales de la plataforma.",
+  },
+  "Histórico de ações para acompanhar a operação com contexto.": {
+    es: "Historial de acciones para supervisar la operación con contexto.",
+  },
+  "Empresas ativas": { es: "Empresas activas" },
+  "Conexão alternativa": { es: "Conexión alternativa" },
+  "Orçamento de IA": { es: "Presupuesto de IA" },
+  "empresas com gasto acumulado ≥80% do teto": {
+    es: "empresas con gasto acumulado ≥80% del límite",
+  },
+  "Nenhum alerta sinalizado pelos indicadores monitorados.": {
+    es: "No hay alertas señaladas por los indicadores supervisados.",
+  },
+  "Espaço da empresa": { es: "Espacio de la empresa" },
+  "Nova empresa": { es: "Nueva empresa" },
+  "empresa cadastrada": { es: "empresa registrada" },
+  "empresas cadastradas": { es: "empresas registradas" },
   "/conversa. Os pagamentos são feitos nos links hospedados pelo Asaas.": {
     es: "/conversación. Los pagos se realizan mediante los enlaces alojados en Asaas.",
   },

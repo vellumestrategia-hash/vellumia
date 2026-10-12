@@ -2,9 +2,17 @@ import type { ReactNode } from "react";
 import { requirePlatformAdmin } from "@/lib/auth/requirePlatformAdmin";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function ProtectedAdminLayout({ children }: { children: ReactNode }) {
   const { user } = await requirePlatformAdmin();
+  // O administrador da Véllum pode existir sem associação com empresa cliente.
+  const supabase = await createClient();
+  const { data: memberships } = await supabase
+    .from("user_organizations")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .limit(1);
   // Mesmo padrão de `app/app/layout.tsx`: o idioma envolve a árvore inteira e
   // recebe o código PRONTO. Sem este Provider, `useT()` nos componentes do
   // admin cai no padrão do Context (pt-BR) e nenhuma tradução aparece, não
@@ -15,7 +23,9 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   const locale = (user.user_metadata?.locale as string | undefined) ?? null;
   return (
     <IdiomaProvider locale={locale}>
-      <AdminShell userEmail={user.email ?? ""}>{children}</AdminShell>
+      <AdminShell userEmail={user.email ?? ""} hasCompanyWorkspace={Boolean(memberships?.length)}>
+        {children}
+      </AdminShell>
     </IdiomaProvider>
   );
 }

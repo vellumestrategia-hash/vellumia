@@ -25,6 +25,7 @@ import { Providers } from "./providers";
 import { PublicEnvScript } from "./public-env-script";
 import "./globals.css";
 import "./vellum.css";
+import "./vellum-refinement.css";
 
 const atkinson = Archivo({
   subsets: ["latin", "latin-ext"],

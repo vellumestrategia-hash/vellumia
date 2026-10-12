@@ -36,11 +36,21 @@
  * Sabotagem que confirma que a guarda vigia: remover o `<TooltipProvider>` de
  * `AdminShell.tsx` deixa o primeiro caso vermelho, nos dois valores de e-mail.
  */
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { ThemeProvider } from "@/lib/theme";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+// JSDOM não implementa a API de preferências que o provider raiz usa no browser.
+beforeAll(() =>
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
+  ),
+);
+afterAll(() => vi.unstubAllGlobals());
 
 // Único mock: o `AdminSidebar` é client component e chama `usePathname`. O
 // banner e o sidebar continuam reais — a casca sob teste é a casca de verdade,
@@ -75,9 +85,11 @@ describe("AdminShell", () => {
     (_rotulo, userEmail) => {
       expect(() =>
         render(
-          <AdminShell userEmail={userEmail}>
-            <UsaTooltipSemProviderProprio />
-          </AdminShell>,
+          <ThemeProvider>
+            <AdminShell userEmail={userEmail}>
+              <UsaTooltipSemProviderProprio />
+            </AdminShell>
+          </ThemeProvider>,
         ),
       ).not.toThrow();
 

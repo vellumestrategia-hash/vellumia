@@ -32,6 +32,18 @@ Sonda autenticada após a última correção confirmou o RPC financeiro disponí
 
 ## Próxima sequência
 
+### Refinamento visual de 12/10/2026
+
+O proprietário confirmou a execução do SQL. Sonda com SDK Supabase confirmou Auth válido, platform_admin full ativo, mfa_required=false e zero vínculos de empresa para a conta solicitada. O catálogo público retornou quatro planos; acesso anônimo aos orçamentos privados foi negado (42501). Nenhum SQL adicional é necessário para o refinamento visual.
+
+Checks completos de 8d870d4d aprovados: CI 38210109038, build/Playwright público 38210109020 e E2E 38210109021. Assim, transporte SQL, bootstrap independente de empresa e classificação dos nomes de etapas foram aprovados no PostgreSQL/ambiente descartável da nuvem.
+
+UI UX Pro Max oficial instalada em C:/Users/Lenovo/.codex/skills/ui-ux-pro-max; direção e critérios em DESIGN-SYSTEM.md. Refinamento atual: demonstração ilustrativa interativa de atendimento, menu público móvel acessível, hierarquia/legibilidade, navegação da plataforma agrupada, conta/saída/tema/idioma, estado inicial orientado e erro com repetição no dashboard. Identificação da empresa e seleção ativa refinadas na casca /app. Componentes mantêm marca resolvida e guards. Conta sem empresa não recebe atalho que pressupõe vínculo.
+
+Testes locais: cinco testes de interação/estados e três do provider de tooltip aprovados. Guard completo de tradução espanhol aprovado após complementar quatro chaves. Lint dos arquivos alterados sem erros. Novas provas públicas incluem 375, 768, 1024 e 1440px, menu/Escape/foco e três etapas; aguardar Actions do novo SHA antes de declarar essa revisão aprovada. Login pelo navegador local retornou à tela de entrada; diagnosticar a propagação de sessão na prévia e repetir a prova visual. Não enfraquecer atributos de cookie para contornar falha de desenvolvimento.
+
+Os parágrafos anteriores de "papel aguardando SQL" são histórico do incidente, substituídos pelas sondas acima. Próximo passo desta etapa: verificação visual e CI do refinamento, com evidências de desktop/celular/tema escuro. Depois retomar IA/canais/financeiro com suas credenciais ainda ausentes.
+
 1. Consultar os checks no Actions para o SHA em revisão e reparar falhas próprias antes de declarar build/isolamento aprovados. Transferência inicial ao GitHub concluída; não repetir clone nem configurar a origem como remoto de escrita.
 2. Aplicar baseline e bootstrap em ambiente de teste Supabase/PostgreSQL. Executar cadastro, onboarding, MFA e isolamento completo entre duas empresas; obter credenciais privadas por arquivo seguro.
 3. Validar agentes/RAG e atendimento real com provedor IA, número Meta de teste e worker. WAHA é alternativa opcional não oficial.

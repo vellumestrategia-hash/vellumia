@@ -15,9 +15,9 @@ export function AlertsBanner({ alerts }: AlertsBannerProps) {
     return (
       <Card>
         <CardContent className="flex items-center gap-3 py-5">
-          <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0" />
+          <CheckCircle className="h-5 w-5 shrink-0 text-primary" aria-hidden />
           <p className="text-sm text-muted-foreground">
-            {t("Nenhum alerta crítico no momento. Tudo certo!")}
+            {t("Nenhum alerta sinalizado pelos indicadores monitorados.")}
           </p>
         </CardContent>
       </Card>
@@ -33,6 +33,7 @@ export function AlertsBanner({ alerts }: AlertsBannerProps) {
         <CardTitle className="flex items-center gap-2 text-base">
           <Warning
             className={`h-4 w-4 ${hasCritical ? "text-red-500" : "text-amber-500"}`}
+            aria-hidden
           />
           {t("Alertas ativos")}
           <span className="ml-auto text-xs font-normal text-muted-foreground">
@@ -41,13 +42,13 @@ export function AlertsBanner({ alerts }: AlertsBannerProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="max-h-80 overflow-y-auto divide-y divide-border">
+        <div className="max-h-80 divide-y divide-border overflow-y-auto">
           {visible.map((alert) => (
             <AlertItem key={alert.id} alert={alert} />
           ))}
         </div>
         {alerts.length > 10 && (
-          <p className="px-3 py-2 text-xs text-muted-foreground border-t">
+          <p className="border-t px-3 py-2 text-xs text-muted-foreground">
             +{alerts.length - 10} {t("alertas adicionais")}
           </p>
         )}
