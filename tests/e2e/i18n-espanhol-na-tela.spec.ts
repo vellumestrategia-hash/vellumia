@@ -111,7 +111,10 @@ const CHAVES_QUE_MUDAM = new Set(
  * interface — e nenhum deles poderia acusar o defeito que ela procura.
  */
 function rotulosDeInterface(textos: string[]): string {
-  return textos.filter((t) => t in DICIONARIO).sort().join("\n");
+  return textos
+    .filter((t) => t in DICIONARIO)
+    .sort()
+    .join("\n");
 }
 
 /** Todo texto que a pessoa consegue LER nesta tela, normalizado. */
@@ -130,6 +133,10 @@ async function textosVisiveis(page: Page): Promise<string[]> {
       const estilo = getComputedStyle(pai);
       if (estilo.display === "none" || estilo.visibility === "hidden") continue;
       if (pai.closest("script,style,noscript")) continue;
+      // O nome de etapa vem de crm_stages.name, sem tradução por decisão do
+      // cliente. "Aguardando pagamento" também é rótulo do financeiro: a origem
+      // do nó distingue o dado da interface sem isentar a chave inteira.
+      if (pai.closest('[data-tenant-content="crm_stages.name"]')) continue;
       saida.push(texto);
     }
     return saida;
@@ -301,7 +308,10 @@ test.describe("o idioma escolhido chega à tela", () => {
     await page.goto(TELAS[0]!);
     await page.waitForLoadState("networkidle", { timeout: PRAZO });
     await porIdiomaEm(page, "es");
-    await page.screenshot({ path: path.join(EVIDENCIA, "01-inbox-em-espanhol.png"), fullPage: true });
+    await page.screenshot({
+      path: path.join(EVIDENCIA, "01-inbox-em-espanhol.png"),
+      fullPage: true,
+    });
 
     // ── 3b. A DATA saiu do português? ──────────────────────────────────────
     //
@@ -343,9 +353,7 @@ test.describe("o idioma escolhido chega à tela", () => {
     for (const tela of TELAS) {
       await page.goto(tela);
       await page.waitForLoadState("networkidle", { timeout: PRAZO });
-      const emPortugues = (await textosVisiveis(page)).filter((txt) =>
-        DATA_EM_PORTUGUES.test(txt),
-      );
+      const emPortugues = (await textosVisiveis(page)).filter((txt) => DATA_EM_PORTUGUES.test(txt));
       expect(
         emPortugues,
         `${tela}: a data continua em português com a interface em espanhol — ` +
@@ -424,6 +432,9 @@ test.describe("o idioma escolhido chega à tela", () => {
         })
         .toBe(rotulosDeInterface(antes.get(tela)!));
     }
-    await page.screenshot({ path: path.join(EVIDENCIA, "02-inbox-de-volta-em-portugues.png"), fullPage: true });
+    await page.screenshot({
+      path: path.join(EVIDENCIA, "02-inbox-de-volta-em-portugues.png"),
+      fullPage: true,
+    });
   });
 });

@@ -25,4 +25,5 @@ it("preserva integralmente o baseline e cada parte cabe no SQL Editor contando U
     expect(parte).toContain("set local check_function_bodies = false;");
   }
   expect(partes[0]).toContain("revoke execute on function %s from public, anon");
+  expect(gerarPartes(baseline.replace(/\r?\n/g, "\r\n"))).toEqual(partes);
 });

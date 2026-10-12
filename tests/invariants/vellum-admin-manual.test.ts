@@ -17,7 +17,7 @@ beforeAll(() => {
     insert into auth.users(id,email,email_confirmed_at) values ('${owner}','${email}',now());`);
 });
 
-it("cria administrador full e vínculo aceito, e reexecução preserva MFA e auditoria", () => {
+it("cria administrador full sem empresa cliente, e reexecução preserva MFA e auditoria", () => {
   sql(script);
   expect(
     countAs(
@@ -30,7 +30,7 @@ it("cria administrador full e vínculo aceito, e reexecução preserva MFA e aud
       owner,
       "select count(*) from public.user_organizations where role='admin' and accepted_at is not null;",
     ),
-  ).toBe(1);
+  ).toBe(0);
   expect(sql(`select mfa_required from public.platform_admins where user_id='${owner}';`)).toBe(
     "f",
   );
@@ -39,7 +39,7 @@ it("cria administrador full e vínculo aceito, e reexecução preserva MFA e aud
   expect(sql(`select mfa_required from public.platform_admins where user_id='${owner}';`)).toBe(
     "t",
   );
-  expect(sql("select count(*) from public.organizations where slug='vellum-ai';")).toBe("1");
+  expect(sql("select count(*) from public.organizations where slug='vellum-ai';")).toBe("0");
   expect(
     sql("select count(*) from public.api_audit_log where action='platform_admin.bootstrap';"),
   ).toBe("1");

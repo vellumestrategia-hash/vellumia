@@ -6,7 +6,10 @@ import { lastLine, sql } from "./gov-helpers";
 it("baseline em partes funciona entre sessões PostgreSQL e termina com catálogo público mínimo", () => {
   const partes = gerarPartes(readFileSync("supabase/baseline.sql", "utf8"));
   for (const [i, parte] of partes.entries()) {
-    expect(lastLine(sql(parte))).toContain(`Parte ${i + 1}/${partes.length} aplicada`);
+    // Simula o transporte pela área de transferência no Windows.
+    expect(lastLine(sql(parte.replace(/\n/g, "\r\n")))).toContain(
+      `Parte ${i + 1}/${partes.length} aplicada`,
+    );
     if (i < partes.length - 1) {
       expect(
         sql(`select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace

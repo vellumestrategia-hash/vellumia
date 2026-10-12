@@ -94,11 +94,27 @@ begin
 end $vellum_instalacao$;
 `;
 
+export function prepararSQLParaEditor(sql) {
+  return separarComandos(sql.replace(/\r\n/g, "\n"))
+    .map((original) => {
+      // O editor/clipboard pode mudar EOL ou indentar linhas dentro de $body$.
+      // Transportar o texto como base64 preserva os bytes e o self-check md5
+      // dos playbooks. O baseline e seus hashes permanecem intactos.
+      return /insert\s+into\s+(?:public\.)?skill_versions\b/i.test(original)
+        ? original.replace(/\$body\$([^]*?)\$body\$/g, (_, corpo) => {
+            const payload = Buffer.from(corpo, "utf8").toString("base64");
+            return `convert_from(decode('${payload}', 'base64'), 'UTF8')`;
+          })
+        : original;
+    })
+    .join("");
+}
+
 export function gerarPartes(baseline, limite = 700000) {
   const grupos = [];
   let atual = "";
   const reserva = Buffer.byteLength(prefixo + proteger) + 500;
-  for (const comando of separarComandos(baseline)) {
+  for (const comando of separarComandos(prepararSQLParaEditor(baseline))) {
     if (Buffer.byteLength(comando) + reserva > limite)
       throw new Error("Comando SQL excede o limite individual");
     if (atual && Buffer.byteLength(atual + comando) + reserva > limite) {
