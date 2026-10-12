@@ -1,5 +1,7 @@
 /** Textos públicos e financeiros da distribuição Véllum; pt-BR preserva a chave. */
 export const DICIONARIO_VELLUM = {
+  "Cadastros indisponíveis": { es: "Registros no disponibles" },
+  "Não foi possível carregar as empresas.": { es: "No se pudieron cargar las empresas." },
   Empresas: { es: "Empresas" },
   Auditoria: { es: "Auditoría" },
   Qualificar: { es: "Calificar" },

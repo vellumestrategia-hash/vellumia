@@ -1,12 +1,71 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect, type Page } from "@playwright/test";
 import { credenciaisSupabaseDeTeste } from "../../scripts/lib/env-de-teste";
 
 const credentials = credenciaisSupabaseDeTeste();
 const db = createClient(credentials.url, credentials.serviceRole, { auth: { persistSession: false } });
 const password = `Local-${randomUUID()}!`;
+
+test("admin de plataforma sem empresa navega no desktop e celular com foco e saída", async ({ page }) => {
+  test.setTimeout(120_000);
+  const email = `plataforma-ui-${randomUUID()}@invariant.test`;
+  const created = await db.auth.admin.createUser({ email, password, email_confirm: true });
+  if (created.error || !created.data.user) throw created.error ?? new Error("user missing");
+  const userId = created.data.user.id;
+  try {
+    const admin = await db.from("platform_admins").insert({ user_id: userId,
+      granted_by: userId, scope: "full", mfa_required: false, reason: "Isolated UI E2E fixture" });
+    if (admin.error) throw admin.error;
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await page.goto("/login?next=/admin/dashboard");
+    await page.getByLabel(/e-?mail/i).fill(email);
+    await page.getByLabel(/senha/i).fill(password);
+    await page.getByRole("button", { name: /entrar/i }).click();
+    await page.waitForURL("**/admin/dashboard", { timeout: 60_000 });
+    await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Atualizar", exact: true })).toBeEnabled();
+    await expect(page.getByRole("link", { name: "Voltar ao aplicativo" })).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const axe = () => new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect((await axe()).violations).toEqual([]);
+    mkdirSync(".superpowers/evidence/vellum-ui", { recursive: true });
+    await page.screenshot({ path: ".superpowers/evidence/vellum-ui/admin-desktop.png" });
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+    const trigger = page.getByRole("button", { name: "Abrir menu de navegação" });
+    await trigger.click();
+    const menu = page.getByRole("dialog", { name: "Menu de navegação" });
+    await expect(menu).toBeVisible();
+    expect((await axe()).violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(menu).not.toBeVisible();
+    await expect(trigger).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect((await axe()).violations).toEqual([]);
+    await page.screenshot({ path: ".superpowers/evidence/vellum-ui/admin-mobile-escuro.png" });
+    await trigger.click();
+    await menu.getByRole("link", { name: "Empresas", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Empresas", exact: true })).toBeVisible();
+    await expect(menu).not.toBeVisible();
+    await page.getByRole("button", { name: "Menu do administrador" }).click();
+    await expect(page.getByText(email, { exact: true }).last()).toBeVisible();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+    await page.waitForURL("**/login", { timeout: 30_000 });
+    await page.goto("/admin/dashboard");
+    await expect(page.getByRole("heading", { name: "Entrar", exact: true })).toBeVisible();
+    const memberships = await db.from("user_organizations").select("id").eq("user_id", userId);
+    expect(memberships.error).toBeNull();
+    expect(memberships.data).toEqual([]);
+  } finally {
+    const removed = await db.auth.admin.deleteUser(userId);
+    if (removed.error) throw removed.error;
+  }
+});
+
 async function insert(table: string, value: Record<string, unknown>) {
   const { data, error } = await db.from(table).insert(value).select("id").single();
   if (error) throw new Error(`${table}: ${error.message}`);

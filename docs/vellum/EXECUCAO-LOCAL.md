@@ -18,11 +18,9 @@ Abra http://localhost:3010, /precos, /login e /signup. /app continua protegido p
 
 A URL base configurada é https://dchhxzssxkrvqqmozydv.supabase.co. O sufixo /rest/v1 é criado pelo SDK e não deve estar em NEXT_PUBLIC_SUPABASE_URL. A chave pública recebida foi gravada em .env.local, ignorado pelo Git. O endpoint de configuração do Auth respondeu HTTP 200 com autenticação por e-mail habilitada.
 
-Ainda falta preencher no mesmo arquivo:
+Chave privada SUPABASE_SERVICE_ROLE_KEY configurada apenas no servidor. Schema e administrador da plataforma confirmados no projeto real. O proprietário prefere executar SQL manualmente; SUPABASE_DB_ADMIN_URL é opcional para essa aplicação manual. Ver SQL-MANUAL.md; não reaplicar uma instalação completa no banco já configurado.
 
-- SUPABASE_SERVICE_ROLE_KEY: chave privada do projeto, apenas servidor.
-- SUPABASE_DB_ADMIN_URL: conexão PostgreSQL para aplicar schema e manutenção.
-- SUPABASE_DB_URL: conexão com privilégios mínimos para o worker e módulos que usam PostgreSQL diretamente.
+Ainda falta SUPABASE_DB_URL com privilégios mínimos para o worker e módulos que usam PostgreSQL diretamente.
 
 Os segredos internos de cron, criptografia e impersonação foram gerados localmente sem imprimir valores. Não substituir a chave privada pela pública: isso não concede os privilégios necessários e mascara um erro de configuração.
 
@@ -34,9 +32,9 @@ Não executar a sequência histórica de migrations em banco vazio: a base impor
 psql $env:SUPABASE_DB_ADMIN_URL -v ON_ERROR_STOP=1 -f supabase/baseline.sql
 ```
 
-O baseline cria tabelas, funções, policies e extensões necessárias. Aplicar somente depois de confirmar o banco de destino e ter backup se houver dados. A aplicação remota não foi executada neste trabalho sem credenciais.
+O baseline cria tabelas, funções, policies e extensões necessárias. Esse comando é referência para instalação nova; o Supabase da Véllum já recebeu os scripts pelo proprietário. O gerador de partes compatíveis com SQL Editor está em scripts/vellum-sql-editor.mjs.
 
-Para o primeiro administrador, usar scripts/bootstrap-owner.ts e o procedimento documentado em hostgator-setup-kit/README.md, sem criar automaticamente uma conta com senha conhecida. Configurar Auth → URL Configuration para a origem da implantação e o callback /auth/confirm; adequar os modelos de e-mail com o procedimento de marca do kit.
+Para administrador exclusivo da Véllum, usar o SQL de plataforma indicado em SQL-MANUAL.md com uma conta Auth existente. Não cria empresa nem vínculo de cliente. A conta solicitada pelo proprietário já acessa /admin/dashboard. O bootstrap-owner da base é um caminho diferente para instalações que também desejem uma empresa inicial. Configurar Auth → URL Configuration para a origem da implantação e o callback /auth/confirm; adequar os modelos de e-mail com o procedimento de marca do kit.
 
 ## Provedores
 
@@ -62,6 +60,8 @@ Definir APP_IMAGE, WORKER_IMAGE e SCHEDULER_IMAGE para imagens próprias locais 
 Cloudflare pode cuidar de DNS e proteção. O app Node, workers, scheduler, WAHA e serviços persistentes precisam de ambiente compatível, como VPS Docker; não assumir execução direta deles em Cloudflare Pages. Health check existente: /api/v1/health. Backups e recuperação: scripts do hostgator-setup-kit e docs/runbooks/.
 
 ## Validação
+
+Executar build, suíte completa e banco descartável no GitHub Actions conforme GITHUB.md. Nesta máquina de 6 GB, usar apenas testes focados e a prévia local; os comandos abaixo são referência para um ambiente com memória suficiente.
 
 ```powershell
 npm run typecheck

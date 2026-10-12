@@ -46,8 +46,8 @@ export function AtendimentoDemo() {
       detalhe: t("Uma pessoa assume com o histórico e a necessidade do contato disponíveis."),
       proximo: t("Conversa com o especialista"),
     },
-  ];
-  const atual = etapas[etapa];
+  ] as const;
+  const atual = etapas[etapa] ?? etapas[0];
   const Icon = atual.icon;
 
   return (

@@ -90,20 +90,18 @@ export function AdminSidebar({
       )}
     >
       <div className="flex min-h-16 shrink-0 items-center gap-3 border-b px-5">
-        {marca.logoUrl ? (
-          // URL de marca resolvida em runtime, incluindo instalações com logo próprio.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={marca.logoUrl} alt="" className="size-9 shrink-0 object-contain" />
-        ) : (
-          <span
-            className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-lg font-semibold text-primary-foreground"
-            aria-hidden
-          >
-            {marca.initial}
-          </span>
-        )}
         <div className="flex flex-col">
-          <span className="text-base font-semibold tracking-tight">{marca.name}</span>
+          {marca.logoUrl ? (
+            // Proporção original: logos horizontais precisam de largura, não de um quadrado.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={marca.logoUrl}
+              alt={marca.name}
+              className="vellum-admin-logo h-7 w-auto max-w-44 self-start object-contain"
+            />
+          ) : (
+            <span className="text-base font-semibold tracking-tight">{marca.name}</span>
+          )}
           <span className="text-xs text-muted-foreground">{t("Administração")}</span>
         </div>
       </div>

@@ -2,10 +2,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { AtendimentoDemo } from "@/components/vellum/AtendimentoDemo";
 import { DashboardClient } from "@/app/admin/(protected)/dashboard/_client";
+import { TenantsClient } from "@/app/admin/(protected)/tenants/_client";
 
-const mocks = vi.hoisted(() => ({ query: vi.fn(), refetch: vi.fn() }));
+const mocks = vi.hoisted(() => ({ query: vi.fn(), tenants: vi.fn(), refetch: vi.fn() }));
 vi.mock("@/hooks/useAdminDashboardKPIs", () => ({ useAdminDashboardKPIs: mocks.query }));
 vi.mock("@/hooks/useAlertsRealtime", () => ({ useAlertsRealtime: vi.fn() }));
+vi.mock("@/hooks/useAdminTenants", () => ({ useAdminTenants: mocks.tenants }));
+vi.mock("@/components/admin/tenants/TenantsFilters", () => ({ TenantsFilters: () => null }));
+vi.mock("@/components/admin/tenants/TenantsTable", () => ({
+  TenantsTable: ({ data }: { data: Array<{ display_name: string }> }) => (
+    <div data-testid="cadastros">{data.map((row) => row.display_name).join(", ")}</div>
+  ),
+  TenantsTableSkeleton: () => <div role="status">Carregando empresas</div>,
+}));
 afterEach(cleanup);
 beforeEach(() => vi.clearAllMocks());
 const kpis = {
@@ -33,6 +42,31 @@ describe("demonstração ilustrativa", () => {
     expect(screen.getByText("Conversa com o especialista")).toBeVisible();
     expect(screen.getByText("EXEMPLO ILUSTRATIVO")).toBeVisible();
     expect(screen.getByText("Marina Costa")).toBeVisible();
+  });
+});
+
+describe("consulta de empresas", () => {
+  it("oferece recuperação sem transformar falha em zero empresas", () => {
+    mocks.tenants.mockReturnValue({ isError: true, isLoading: false, refetch: mocks.refetch });
+    render(<TenantsClient />);
+    expect(screen.getByText("Cadastros indisponíveis")).toBeVisible();
+    expect(screen.getByRole("alert")).toHaveTextContent("Não foi possível carregar as empresas.");
+    expect(screen.queryByText(/empresas cadastradas/)).toBeNull();
+    expect(screen.queryByTestId("cadastros")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    expect(mocks.refetch).toHaveBeenCalledOnce();
+  });
+  it("preserva os cadastros disponíveis se a atualização falhar", () => {
+    mocks.tenants.mockReturnValue({
+      data: { pages: [{ data: [{ display_name: "Empresa de teste" }] }] },
+      isError: true,
+      isLoading: false,
+      refetch: mocks.refetch,
+    });
+    render(<TenantsClient />);
+    expect(screen.getByRole("alert")).toBeVisible();
+    expect(screen.getByTestId("cadastros")).toHaveTextContent("Empresa de teste");
+    expect(screen.getByText("1 empresa cadastrada")).toBeVisible();
   });
 });
 

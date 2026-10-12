@@ -886,6 +886,15 @@ jobs:
           # ver o comentário do passo de build: vazio NÃO desliga.
           SENTRY_DSN: "off"
 
+      - name: Evidências visuais da administração Véllum
+        uses: actions/upload-artifact@v7
+        if: always() && matrix.parte == 3
+        with:
+          name: vellum-admin-ui-${{ github.sha }}
+          path: .superpowers/evidence/vellum-ui/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

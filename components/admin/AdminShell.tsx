@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { PlatformModeBanner } from "./PlatformModeBanner";
 import { AdminSidebar } from "./AdminSidebar";
@@ -60,6 +60,7 @@ interface AdminShellProps {
 export function AdminShell({ userEmail, hasCompanyWorkspace = false, children }: AdminShellProps) {
   const t = useT();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const mobileNavTrigger = useRef<HTMLButtonElement>(null);
   // Mesmo padrão de `app/app/_components/AppShell.tsx`: ajuste de estado
   // durante o render, não em `useEffect` (ver comentário lá).
   const pathname = usePathname();
@@ -79,7 +80,14 @@ export function AdminShell({ userEmail, hasCompanyWorkspace = false, children }:
         <div className="flex flex-1">
           <AdminSidebar userEmail={userEmail} hasCompanyWorkspace={hasCompanyWorkspace} />
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-            <SheetContent side="left" className="w-72 max-w-[85vw] gap-0 p-0 lg:hidden">
+            <SheetContent
+              side="left"
+              className="vellum-admin-menu w-72 max-w-[85vw] gap-0 p-0 lg:hidden"
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                mobileNavTrigger.current?.focus();
+              }}
+            >
               <SheetTitle className="sr-only">{t("Menu de navegação")}</SheetTitle>
               <AdminSidebar
                 userEmail={userEmail}
@@ -93,6 +101,7 @@ export function AdminShell({ userEmail, hasCompanyWorkspace = false, children }:
             <header className="flex min-h-16 items-center justify-between gap-2 border-b bg-card px-3 sm:px-6">
               <div className="flex min-w-0 items-center gap-2">
                 <Button
+                  ref={mobileNavTrigger}
                   type="button"
                   variant="ghost"
                   size="icon"

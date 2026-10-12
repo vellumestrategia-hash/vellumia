@@ -1959,3 +1959,16 @@ Produto `7f1d0f3e`, integrado à main `ca895850`: as dez specs de organizações
 Evidência local preservada em `.superpowers/evidence/comunidade-360/final-qa-targeted-r4/` e log `.superpowers/sdd/comunidade-360/final-qa-targeted-r4.log`. A rodada inclui atualização concorrente da interface sem perder formulário, sugestão obsoleta sem confirmação antiga de sucesso e encerramento de suporte com retorno ao contexto original.
 
 Validação integral do mesmo produto: 733 arquivos unitários / 7.911 casos aprovados + 1 falha esperada; 184 arquivos de banco / 1.466 casos aprovados + 1 falha esperada e 1 ignorado, com INSTALL e UPDATE; tipos, lint (0 erros, 344 avisos) e build aprovados. `lint:channels`, validadores shell e conferência de release também passaram. Os checks remotos continuam sendo condição do merge pelo revisor da PR #613.
+
+
+## Véllum — refinamento de interface de 12/10/2026
+
+| Jornada | Prova |
+| --- | --- |
+| Landing: atender, qualificar e passar ao time | Demonstração identificada como ilustrativa, conteúdo e contexto mudam mantendo foco; teste unitário e script público Playwright |
+| Menu público móvel | Diálogo, acesso a Planos e Escape com retorno de foco em 375/768px; script público com Axe |
+| Administração sem empresa | Login da conta proprietária comprovado localmente; E2E isolado em organizacoes-criacao-convite-e-cache valida plataforma sem vínculos, desktop/celular/escuro/Axe/foco/saída |
+| Falha de consulta | Dashboard e Empresas distinguem erro de zero registros, oferecem repetição e preservam últimos dados; testes unitários |
+| Tema salvo | Hidratação conserva HTML do servidor e restaura preferência do navegador; teste de hidratação e inspeção real sem aviso |
+
+Capturas de fixtures da administração: artifact vellum-admin-ui-SHA do E2E; capturas públicas: artifact vellum-publico-SHA do perf. Conferir execução aprovada para o mesmo SHA antes de tratar as provas novas da nuvem como concluídas.

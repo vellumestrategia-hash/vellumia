@@ -13,9 +13,9 @@ import { useIdioma } from "@/lib/i18n/IdiomaProvider";
 
 function KPISkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-hidden>
+    <div className="grid grid-cols-2 gap-4 xl:grid-cols-5" aria-hidden>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Card key={i}>
+        <Card key={i} className="vellum-kpi">
           <CardContent className="space-y-3 pt-6">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-8 w-16" />

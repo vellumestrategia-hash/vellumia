@@ -8,6 +8,9 @@ import type { NextConfig } from "next";
  *  - Initial bundle /app/inbox < 250KB gzipped
  */
 const nextConfig: NextConfig = {
+  // Next 16.3 registra argumentos de Server Functions por padrão em dev,
+  // inclusive senha nas ações de autenticação. Auditoria própria não leva segredos.
+  logging: { serverFunctions: false },
   // Self-host: gera .next/standalone pro container Docker (node server.js).
   // Na Vercel (VERCEL=1) fica desligado — Next 16.3 + adapter + standalone
   // quebra o onBuildComplete com ENOENT next-server.js.nft.json (#96646).

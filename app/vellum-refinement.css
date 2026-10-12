@@ -540,6 +540,12 @@
 .vellum-admin-main {
   scroll-margin-top: 116px;
 }
+.vellum-admin-logo {
+  height: 36px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #fff;
+}
 .vellum-admin-main h1 {
   font-family: var(--font-display), Georgia, serif;
   font-size: clamp(28px, 3vw, 38px);
@@ -555,6 +561,14 @@
 }
 .vellum-admin-sidebar a:focus-visible {
   outline: 2px solid var(--ring);
+}
+.vellum-admin-menu > button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  top: 10px;
+  right: 8px;
 }
 .vellum-admin-welcome {
   display: flex;
@@ -813,6 +827,9 @@
   }
 }
 @media (max-width: 520px) {
+  .vellum-kpi:last-child {
+    grid-column: 1 / -1;
+  }
   .vellum-demo-caption {
     padding: 16px;
   }
@@ -857,6 +874,7 @@
 @media (prefers-reduced-motion: reduce) {
   .vellum-site *,
   .vellum-admin-shell *,
+  .vellum-admin-menu *,
   .vellum-workspace-shell *,
   .vellum-mobile-nav * {
     animation-duration: 0.01ms !important;

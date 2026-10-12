@@ -12,8 +12,16 @@ export function TenantsClient() {
   const t = useT();
   const [filters, setFilters] = useState<AdminTenantsFilters>({});
 
-  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useAdminTenants(filters);
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetching,
+    refetch,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useAdminTenants(filters);
 
   const rows = data?.pages.flatMap((p) => p.data ?? []) ?? [];
   const total = rows.length;
@@ -25,7 +33,9 @@ export function TenantsClient() {
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">{t("Empresas")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isLoading ? (
+            {isError && !data ? (
+              t("Cadastros indisponíveis")
+            ) : isLoading ? (
               t("Carregando...")
             ) : (
               <>
@@ -47,10 +57,32 @@ export function TenantsClient() {
       {/* Filters */}
       <TenantsFilters filters={filters} onChange={setFilters} />
 
+      {isError && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm"
+        >
+          <div>
+            <p className="font-medium">{t("Não foi possível carregar as empresas.")}</p>
+            <p className="mt-1 text-muted-foreground">
+              {t("Verifique sua conexão e tente atualizar novamente.")}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="min-h-11"
+            disabled={isFetching}
+            onClick={() => void refetch()}
+          >
+            {isFetching ? t("Atualizando…") : t("Tentar novamente")}
+          </Button>
+        </div>
+      )}
+
       {/* Table */}
       {isLoading ? (
         <TenantsTableSkeleton />
-      ) : (
+      ) : isError && !data ? null : (
         <TenantsTable
           data={rows}
           hasNextPage={hasNextPage}
