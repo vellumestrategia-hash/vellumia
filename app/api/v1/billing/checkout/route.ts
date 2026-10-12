@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { requireRole } from "@/lib/auth/require-role";
+import { requireSupportWrite } from "@/lib/impersonate/support";
 import { ok, fail } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { checkRateLimit } from "@/lib/ai/dispatcher/rate-limit";
@@ -14,6 +15,8 @@ export async function POST(req: Request) {
     return fail("forbidden", "Contratação exige a sessão do administrador da empresa.", 403, {
       requestId,
     });
+  const supportBlocked = await requireSupportWrite(authz.org.orgId);
+  if (supportBlocked) return supportBlocked;
   if (!(await checkRateLimit(`billing:${authz.org.orgId}`, 5, 60)).allowed)
     return fail("rate_limited", "Aguarde antes de tentar novamente.", 429, { requestId });
   const parsed = z

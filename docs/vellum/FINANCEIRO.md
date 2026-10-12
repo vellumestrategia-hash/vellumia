@@ -22,7 +22,7 @@ Os testes PostgreSQL embarcados exercitam a migration financeira com o contrato 
 
 Configurar `ASAAS_SANDBOX_API_KEY` e `ASAAS_WEBHOOK_TOKEN` no servidor; webhook `POST /api/v1/webhooks/asaas`, header `asaas-access-token`. Escolher envio sequencial e eventos de cobranças. A URL precisa ser pública em homologação. Tokens diferentes para API e webhook. Não existe chave de produção nem seletor de host nesta implementação.
 
-Aplicar baseline em instalação nova; a migration 0231 está refletida no apêndice e MANIFEST. `/admin/billing` permite editar planos; `/app/settings/billing` mostra contratação, faturas e conversas persistidas. A reserva única de contratação tem estados `creating`, `ready` e `review`; uma operação em revisão exige consulta ao gateway e saneamento pelo operador.
+Aplicar baseline em instalação nova; a migration 0232 está refletida no apêndice e MANIFEST. `/admin/billing` permite editar planos; `/app/settings/billing` mostra contratação, faturas e conversas persistidas. A reserva única de contratação tem estados `creating`, `ready` e `review`; uma operação em revisão exige consulta ao gateway e saneamento pelo operador.
 
 `VELLUM_BILLING_ENFORCEMENT=true` habilita o gate no seam canônico de LLM, antes de resolver credenciais ou chamar o provedor. Ele recusa assinatura ausente/inativa/expirada e gasto no teto USD escolhido no snapshot. A régua permanece `fn_gasto_de_ia_do_mes`, compartilhada com o orçamento da base. No inbound, a recusa usa a passagem ao atendente já existente; o acesso humano e os dados continuam disponíveis. Falha de banco também recusa a chamada. Enquanto o schema e a jornada não forem homologados, manter `false`. Os caminhos legados depreciados não são autorizados para operação SaaS.
 

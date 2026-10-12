@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/wrappers";
 import { audit } from "@/lib/audit";
 import { planoFinanceiroSchema } from "@/lib/vellum/financeiro";
+import { requireSupportWrite } from "@/lib/impersonate/support";
 
 export async function PUT(req: Request) {
   const requestId = randomUUID();
@@ -20,6 +21,8 @@ export async function PUT(req: Request) {
     return fail("forbidden", "Encerre o suporte temporário para editar planos.", 403, {
       requestId,
     });
+  const supportBlocked = await requireSupportWrite();
+  if (supportBlocked) return supportBlocked;
   const parsed = planoFinanceiroSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success)
     return fail("validation_failed", "Revise os valores do plano.", 422, { requestId });

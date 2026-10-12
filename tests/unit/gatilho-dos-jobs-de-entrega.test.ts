@@ -1,4 +1,8 @@
 /**
+ * Véllum: publicação, release, acolhida e relógio da base foram explicitamente
+ * restritos à origem. O mapa fixa essas condições completas; checks ci/e2e/perf
+ * continuam obrigatoriamente sem interruptor. O contrato original segue abaixo.
+ *
  * NENHUM JOB PODE SER DESLIGADO POR UMA CONDIÇÃO — E PASSAR VERDE.
  *
  * ## O buraco medido (issue #459)
@@ -66,13 +70,13 @@ const DIR = join(process.cwd(), ".github/workflows");
 const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string }> = {
   // --- a cadeia que leva o conserto até a VPS ---------------------------------
   "release.yml::abrir-pr-de-release": {
-    condicao: "github.event_name == 'workflow_dispatch'",
+    condicao: "github.repository == 'melgarafael/DeskcommCRM' && github.event_name == 'workflow_dispatch'",
     efeito:
       "Este job é quem monta o PR de release a partir dos fragmentos de `.changes/`. " +
       "Desligá-lo faz nenhuma versão ser fechada — sem erro em lugar nenhum.",
   },
   "release.yml::cortar-tag": {
-    condicao: "github.event_name == 'push'",
+    condicao: "github.repository == 'melgarafael/DeskcommCRM' && github.event_name == 'push'",
     efeito:
       "Este job é quem CRIA E EMPURRA a tag `vX.Y.Z`, que é o gatilho da atualização " +
       "do parque instalado inteiro. Desligá-lo faz a release parar em silêncio: nenhuma " +
@@ -80,20 +84,20 @@ const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string
       "rodando `update.sh` e não recebendo nada.",
   },
   "publish-image.yml::a-tag-veio-da-main": {
-    condicao: null,
+    condicao: "github.repository == 'melgarafael/DeskcommCRM'",
     efeito:
       "Esta é a trava de procedência: nenhuma tag publica sem estar contida na `main`. " +
       "Ela é SEM `if:` de propósito — pulada, ela deixaria `build-and-push` pulado junto " +
       "e o `imagens-ok` leria `skipped` como reprovação.",
   },
   "publish-image.yml::build-and-push": {
-    condicao: null,
+    condicao: "github.repository == 'melgarafael/DeskcommCRM'",
     efeito:
       "Este job PUBLICA as três imagens no GHCR — é o artefato que o self-hoster instala. " +
       "Desligá-lo faz a tag existir sem imagem por trás dela.",
   },
   "publish-image.yml::imagem-do-app-sobe": {
-    condicao: null,
+    condicao: "github.repository == 'melgarafael/DeskcommCRM'",
     efeito:
       "Este job prova que a imagem do app BOOTA, não só que ela constrói. Desligá-lo " +
       "devolve o defeito que derrubou a produção: imagem publicada que morre no " +
@@ -107,7 +111,7 @@ const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string
   // versão anterior sem que nada tenha ficado vermelho.
   "publish-image.yml::promover-stable": {
     condicao:
-      "github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')",
+      "github.repository == 'melgarafael/DeskcommCRM' && github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')",
     efeito:
       "As três condições barram um caminho medido cada uma. Sem `push`, um dispatch numa " +
       "release ANTIGA faria `stable` REGREDIR, e todo self-hoster no default do compose " +
@@ -116,7 +120,7 @@ const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string
   },
 
   "publish-image.yml::imagens-ok": {
-    condicao: "always()",
+    condicao: "always() && github.repository == 'melgarafael/DeskcommCRM'",
     efeito:
       "Este é o check obrigatório `imagens-ok`, a fachada que a branch protection exige. " +
       "Ele precisa de `always()` para poder LER `skipped` dos `needs` e reprovar — e " +
@@ -155,6 +159,7 @@ const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string
   // --- e o que legitimamente tem interruptor -----------------------------------
   "acolhida.yml::acolher": {
     condicao:
+      "github.repository == 'melgarafael/DeskcommCRM' && " +
       "github.repository_owner == 'melgarafael' && " +
       "github.event.pull_request.head.repo.full_name != github.repository",
     efeito:
@@ -165,7 +170,7 @@ const GATILHO_ESPERADO: Record<string, { condicao: string | null; efeito: string
       "gente no repositório dele, prometendo um prazo que ninguém lá concordou em cumprir.",
   },
   "relogio.yml::tick": {
-    condicao: "vars.RELOGIO_LIGADO == '1' || github.event_name == 'workflow_dispatch'",
+    condicao: "github.repository == 'melgarafael/DeskcommCRM' && (vars.RELOGIO_LIGADO == '1' || github.event_name == 'workflow_dispatch')",
     efeito:
       "Este é o relógio que bate o cron. A condição aqui é um interruptor DELIBERADO " +
       "(`vars.RELOGIO_LIGADO`), não uma adaptação de fork — mas ela fica no mapa para " +

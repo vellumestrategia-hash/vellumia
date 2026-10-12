@@ -1,4 +1,6 @@
 "use client";
+import { useT } from "@/lib/i18n/IdiomaProvider";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatarBRL } from "@/lib/vellum/catalogo";
@@ -11,6 +13,8 @@ export function Checkout({
   planos: PlanoComercial[];
   disponivel: boolean;
 }) {
+  const t = useT();
+
   const [plano, setPlano] = useState(planos.find((p) => p.preco_cents !== null)?.id ?? "");
   const [busy, setBusy] = useState(false);
   const [erro, setErro] = useState("");
@@ -37,7 +41,7 @@ export function Checkout({
   return (
     <div className="space-y-3">
       <label htmlFor="billing-plan" className="block text-sm font-medium">
-        Plano mensal
+        {t("Plano mensal")}
       </label>
       <select
         id="billing-plan"
@@ -50,20 +54,23 @@ export function Checkout({
           .filter((p) => p.preco_cents !== null)
           .map((p) => (
             <option value={p.id} key={p.id}>
-              {p.nome} · {formatarBRL(p.preco_cents!)}/mês
+              {p.nome} · {formatarBRL(p.preco_cents!)}
+              {t("/mês")}
             </option>
           ))}
       </select>
       {selected && (
         <p className="text-sm text-muted-foreground">
-          Implantação: {formatarBRL(selected.setup_price_cents ?? 100000)}. Excedente:{" "}
-          {formatarBRL(selected.overage_price_cents ?? 200)}/conversa. Os pagamentos são feitos nos
-          links hospedados pelo Asaas.
+          {t("Implantação: ")}
+          {formatarBRL(selected.setup_price_cents ?? 100000)}
+          {t(". Excedente:")} {formatarBRL(selected.overage_price_cents ?? 200)}
+          {t("/conversa. Os pagamentos são feitos nos links hospedados pelo Asaas.")}
         </p>
       )}
       <p className="text-sm">
-        Ambiente de teste sandbox. Nenhum valor real será movimentado. Gerar os links ainda não
-        ativa a assinatura.
+        {t(
+          "Ambiente de teste sandbox. Nenhum valor real será movimentado. Gerar os links ainda não ativa a assinatura.",
+        )}
       </p>
       <button
         type="button"
@@ -71,16 +78,16 @@ export function Checkout({
         onClick={contratar}
         disabled={!disponivel || busy || !plano}
       >
-        {busy ? "Preparando…" : "Gerar contratação em sandbox"}
+        {busy ? t("Preparando…") : t("Gerar contratação em sandbox")}
       </button>
       {!disponivel && (
         <p className="text-sm text-muted-foreground">
-          O administrador precisa instalar o financeiro e configurar o Asaas sandbox.
+          {t("O administrador precisa instalar o financeiro e configurar o Asaas sandbox.")}
         </p>
       )}
       {erro && (
         <p role="alert" className="text-sm text-destructive">
-          {erro}
+          {t(erro)}
         </p>
       )}
     </div>

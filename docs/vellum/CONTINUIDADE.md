@@ -1,6 +1,6 @@
 # Véllum AI — ponto de continuidade
 
-Atualização: 11/10/2026. Pasta de trabalho: VellumAI. Destino autorizado: https://github.com/vellumestrategia-hash/vellumia, branch main. A ordem posterior do usuário autoriza envio e continuidade nesse repositório; os repositórios de origem permanecem preservados.
+Atualização: 12/10/2026. Pasta de trabalho: VellumAI. Destino autorizado: https://github.com/vellumestrategia-hash/vellumia, branch main. A ordem posterior do usuário autoriza envio e continuidade nesse repositório; os repositórios de origem permanecem preservados.
 
 ## Estado comprovado
 
@@ -8,7 +8,7 @@ Atualização: 11/10/2026. Pasta de trabalho: VellumAI. Destino autorizado: http
 - Marca Véllum aplicada a landing, preços, login/cadastro, defaults de marca e módulos financeiros. Paleta, selo e fontes vêm da pasta original Véllum/relancamento, que foi preservada.
 - CRM, agentes, RAG, Meta, WAHA, follow-up, RBAC, RLS, auditoria, workers, dashboards e onboarding da base são mantidos.
 - Financeiro: planos editáveis; checkout Asaas sandbox; assinatura e implantação; faturas; webhook idempotente com confirmação no provedor; medição de conversas por janela de 24 horas; gate opcional de assinatura/orçamento IA. Contratos em FINANCEIRO.md.
-- Migration 0231 sincronizada com baseline e MANIFEST. PGlite testa a migration com contratos mínimos e RLS de duas empresas.
+- Migration 0232 sincronizada com baseline e MANIFEST. PGlite testa a migration com contratos mínimos e RLS de duas empresas.
 - Evidências locais: 418 testes em 40 arquivos selecionados; TypeScript completo aprovado com heap 4096 MB; lint sem erros; Playwright público/Axe aprovado em desktop e celular. Ver RELATORIO.md para limites e evidências.
 - Build local de produção interrompido por pressão de memória; não foi aprovado. Máquina com 6 GB. As verificações completas passam a ser executadas no Actions após o envio.
 - GitHub: envio de main confirmado no commit bcd3e285ad3abdbee4270d4ef71fdbc92da896a7; histórico preservado e origin aponta somente para vellumestrategia-hash/vellumia. A conta henrriquelealbranco recebeu WRITE. Workflows de verificação registrados no GitHub; automações upstream restritas à origem e configuração Codespaces preparada. Preparação validada com 37 testes em 7 arquivos, parse dos sete workflows, migration sincronizada e licença intacta. Varredura dos 3978 arquivos versionados não encontrou os sete valores privados presentes no ambiente local. Consultar Actions para o resultado remoto do SHA em revisão; registro de workflow não comprova execução aprovada.
@@ -16,9 +16,15 @@ Atualização: 11/10/2026. Pasta de trabalho: VellumAI. Destino autorizado: http
 
 ## Ambiente privado
 
-Supabase base: https://dchhxzssxkrvqqmozydv.supabase.co. URL/chave pública e segredos técnicos estão em `.env.local`, ignorado pelo Git. A API Auth respondeu 200; organizações/marca responderam 404/PGRST205 em sondas sem linhas. Nenhum schema, usuário ou pagamento foi criado remotamente.
+Supabase base: https://dchhxzssxkrvqqmozydv.supabase.co. URL/chave pública e segredos técnicos estão em `.env.local`, ignorado pelo Git. A API Auth respondeu 200; organizações/marca responderam 404/PGRST205 em sondas sem linhas. Conta solicitada pelo proprietário criada em Supabase Auth, e-mail confirmado e login com senha validado. Papel administrador e organização aguardam execução do SQL manual; nenhum pagamento criado.
 
-Faltam SUPABASE_SERVICE_ROLE_KEY e SUPABASE_DB_ADMIN_URL. Asaas sandbox e credenciais IA/Meta ainda não configurados. VELLUM_BILLING_ENFORCEMENT=false até homologação; AI_BUDGET_ENFORCEMENT=on; SENTRY_DSN=off. Nunca imprimir ou versionar segredos.
+Chave privada Supabase configurada e validada apenas no .env.local. SUPABASE_DB_ADMIN_URL não foi fornecida; o proprietário prefere executar SQL no painel. Asaas sandbox e credenciais IA/Meta ainda não configurados. VELLUM_BILLING_ENFORCEMENT=false até homologação; AI_BUDGET_ENFORCEMENT=on; SENTRY_DSN=off. Nunca imprimir ou versionar segredos.
+
+## Atualização de 12/10/2026
+
+Build de produção e verificação pública Playwright/Axe aprovados no GitHub para ea2124c2 (run 38196916647). A suíte completa desse SHA encontrou falhas de importação e dos contratos novos. Correções em revisão: migration financeira renumerada 0232, catálogo público SECURITY INVOKER com privilégios de coluna, financeiro antes da varredura anon final, prova PostgreSQL de isolamento registrada, guards de suporte canônicos, condições upstream explícitas nos testes e tradução espanhola nas telas novas. Resultados futuros devem ser conferidos para o novo SHA.
+
+O usuário solicita receber os SQLs necessários e executá-los pessoalmente. Ver SQL-MANUAL.md. O SQL Editor rejeitou o baseline de 1,2 MB antes de executar; scripts/vellum-sql-editor.mjs produz duas partes abaixo de 700 KB, preservando comandos inteiros e configuração por sessão. Template de bootstrap cria organização, vínculo admin aceito e papel full sem redefinir senha nem desativar MFA já configurado. Conta Auth criada ainda não comprova o papel na aplicação. A parte 1 foi reconhecida pela API (tabelas disponíveis); a parte 2 falhou por search_path ausente entre sessões e foi regenerada com public, extensions. Aguardar confirmação pela API do financeiro e do acesso após a repetição da parte 2 e do bootstrap. Testes locais selecionados: 11 casos em quatro arquivos (tradução, suporte, divisão SQL e UI) e 28 em cinco arquivos (migration financeira/RLS mínima, rotas, acesso, MANIFEST e hardening final), todos aprovados. PostgreSQL completo dos scripts manuais depende do novo CI.
 
 ## Próxima sequência
 

@@ -7,7 +7,7 @@ import { beforeAll, beforeEach, afterAll, describe, it, expect } from "vitest";
 // PostgreSQL embarcado real; stubs limitados ao contrato da base importada.
 // Não toca o projeto remoto e não substitui os invariantes do baseline inteiro.
 const migration = readFileSync(
-  "supabase/migrations/20261012010000_0231_vellum_billing.sql",
+  "supabase/migrations/20261012010000_0232_vellum_billing.sql",
   "utf8",
 );
 const orgA = "10000000-0000-0000-0000-000000000001",
@@ -24,6 +24,7 @@ let db: PGlite;
 beforeAll(async () => {
   db = new PGlite();
   await db.exec(`
+  set timezone = 'America/Sao_Paulo';
   create role anon; create role authenticated; create role service_role bypassrls;
   create schema auth;
   create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('test.actor',true),'')::uuid$$;
@@ -148,6 +149,10 @@ describe("migration financeira PostgreSQL", () => {
     ).rows[0]?.plans;
     expect(published).toHaveLength(4);
     expect(JSON.stringify(published)).not.toContain("ai_budget");
+    await expect(db.exec("select ai_budget_usd_cents from billing_plans")).rejects.toThrow(
+      /permission denied/,
+    );
+    await expect(db.exec("select * from billing_plans")).rejects.toThrow(/permission denied/);
   });
   it("cobra uma janela por contato, inclusive em outro canal; saída/grupo não contam", async () => {
     await message();

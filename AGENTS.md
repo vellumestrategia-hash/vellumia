@@ -8,6 +8,8 @@ Leia primeiro `docs/vellum/CONTINUIDADE.md` e atualize-o ao concluir uma etapa. 
 
 `docs/vellum/PLANO-TECNICO.md`, `docs/vellum/EXECUCAO-LOCAL.md` e `docs/vellum/RELATORIO.md` registram a adaptação e o estado comprovado. Marca padrão Véllum AI é deliberada nesta distribuição. A identidade vem de ../Véllum/relancamento; preservar aquela pasta. A monetização SaaS substitui a premissa self-host do texto original abaixo. Módulos existentes e seus guards, RLS e testes continuam valendo.
 
+O proprietário prefere receber e executar SQL no Supabase; entregar migrations e instruções segundo docs/vellum/SQL-MANUAL.md.
+
 Sem chave privada, só a prévia pública de desenvolvimento funciona; não inventar credenciais, métricas, assinaturas ou pagamentos. Produção continua exigindo service_role e demais serviços. Docker ausente e schema remoto ainda não aplicado não constituem teste verde de RLS.
 
 ---

@@ -1,9 +1,11 @@
+import { traduzir } from "@/lib/i18n/dicionario";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { carregarPlanosPublicos } from "@/lib/vellum/plans-server";
 import { asaasConfigurado } from "@/lib/vellum/asaas";
 import { calcularExcedente, linkSeguroAsaas } from "@/lib/vellum/financeiro";
 import { Checkout } from "./Checkout";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 const moeda = (cents: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
@@ -23,10 +25,14 @@ const estados: Record<string, string> = {
 export async function Financeiro({
   orgId,
   suporteTemporario,
+  idioma = "pt-BR",
 }: {
   orgId: string;
   suporteTemporario: boolean;
+  idioma?: Idioma;
 }) {
+  const t = (texto: string) => traduzir(texto, idioma);
+
   const db = await createClient();
   const planos = await carregarPlanosPublicos();
   const { data: subscription, error } = await db
@@ -37,17 +43,18 @@ export async function Financeiro({
   if (error)
     return (
       <Card className="p-6">
-        <h2 className="font-semibold">Financeiro ainda não instalado</h2>
+        <h2 className="font-semibold">{t("Financeiro ainda não instalado")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          O schema financeiro precisa ser aplicado ao banco. Nenhum consumo ou pagamento é exibido
-          antes da configuração.
+          {t(
+            "O schema financeiro precisa ser aplicado ao banco. Nenhum consumo ou pagamento é exibido antes da configuração.",
+          )}
         </p>
       </Card>
     );
   if (!subscription)
     return (
       <Card className="max-w-3xl space-y-4 p-6">
-        <h2 className="font-semibold">Escolha sua assinatura</h2>
+        <h2 className="font-semibold">{t("Escolha sua assinatura")}</h2>
         <Checkout planos={planos} disponivel={asaasConfigurado() && !suporteTemporario} />
       </Card>
     );
@@ -77,51 +84,59 @@ export async function Financeiro({
       <Card className="max-w-3xl space-y-3 p-6">
         <h2 className="font-semibold">
           {planos.find((p) => p.id === subscription.plan_id)?.nome ?? subscription.plan_id} ·{" "}
-          {estados[subscription.status] ?? subscription.status}
+          {t(estados[subscription.status] ?? subscription.status)}
         </h2>
         <p>
-          {moeda(subscription.monthly_price_cents)}/mês · {subscription.included_conversations}{" "}
-          conversas incluídas.
+          {moeda(subscription.monthly_price_cents)}
+          {t("/mês")} · {subscription.included_conversations} {t("conversas incluídas.")}
         </p>
         <p className="text-sm text-muted-foreground">
-          Contratação: {estados[subscription.checkout_state] ?? subscription.checkout_state}.{" "}
+          {t("Contratação: ")}
+          {t(estados[subscription.checkout_state] ?? subscription.checkout_state)}.{" "}
           {subscription.checkout_state === "review" &&
-            "Consulte o administrador para conciliar a operação antes de tentar novamente."}
+            t("Consulte o administrador para conciliar a operação antes de tentar novamente.")}
         </p>
         {count !== null && !usageError && (
           <p>
-            Conversas abertas neste período: <strong>{count}</strong>. Excedente apurado:{" "}
-            {moeda(excess!.amount_cents)} ({excess!.conversas} conversas).
+            {t("Conversas abertas neste período: ")}
+            <strong>{count}</strong>
+            {t(". Excedente apurado:")} {moeda(excess!.amount_cents)} ({excess!.conversas}{" "}
+            {t(" conversas).")}
           </p>
         )}
-        {usageError && <p role="alert">Não foi possível consultar o consumo.</p>}
+        {usageError && <p role="alert">{t("Não foi possível consultar o consumo.")}</p>}
         {subscription.period_start && (
           <p className="text-sm">
-            Período: {subscription.period_start} a {subscription.period_end}. Custos de IA e Meta
-            são medidos separadamente em Uso de IA.
+            {t("Período: ")}
+            {subscription.period_start} {t(" a ")}
+            {subscription.period_end}
+            {t(". Custos de IA e Meta são medidos separadamente em Uso de IA.")}
           </p>
         )}
         <p className="text-sm text-muted-foreground">
-          Alteração de plano e cancelamento: solicite ao administrador. Não há cobrança automática
-          de excedentes nesta etapa de homologação.
+          {t(
+            "Alteração de plano e cancelamento: solicite ao administrador. Não há cobrança automática de excedentes nesta etapa de homologação.",
+          )}
         </p>
       </Card>
       <section className="space-y-3">
-        <h2 className="font-semibold">Faturas · sandbox</h2>
+        <h2 className="font-semibold">{t("Faturas · sandbox")}</h2>
         {invoiceError ? (
-          <p role="alert">Não foi possível consultar as faturas.</p>
+          <p role="alert">{t("Não foi possível consultar as faturas.")}</p>
         ) : !invoices?.length ? (
-          <p className="text-sm text-muted-foreground">Ainda não há faturas sincronizadas.</p>
+          <p className="text-sm text-muted-foreground">
+            {t("Ainda não há faturas sincronizadas.")}
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr>
-                  <th className="p-3">Tipo</th>
-                  <th className="p-3">Vencimento</th>
-                  <th className="p-3">Valor</th>
-                  <th className="p-3">Situação</th>
-                  <th className="p-3">Pagamento</th>
+                  <th className="p-3">{t("Tipo")}</th>
+                  <th className="p-3">{t("Vencimento")}</th>
+                  <th className="p-3">{t("Valor")}</th>
+                  <th className="p-3">{t("Situação")}</th>
+                  <th className="p-3">{t("Pagamento")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,14 +144,14 @@ export async function Financeiro({
                   <tr key={i.provider_payment_id} className="border-t">
                     <td className="p-3">
                       {i.kind === "setup"
-                        ? "Implantação"
+                        ? t("Implantação")
                         : i.kind === "monthly"
-                          ? "Mensalidade"
-                          : "Excedentes"}
+                          ? t("Mensalidade")
+                          : t("Excedentes")}
                     </td>
                     <td className="p-3">{i.due_date}</td>
                     <td className="p-3">{moeda(i.amount_cents)}</td>
-                    <td className="p-3">{estados[i.status] ?? i.status}</td>
+                    <td className="p-3">{t(estados[i.status] ?? i.status)}</td>
                     <td className="p-3">
                       {linkSeguroAsaas(i.invoice_url) && i.status !== "paid" ? (
                         <a
@@ -145,7 +160,7 @@ export async function Financeiro({
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Abrir no Asaas
+                          {t("Abrir no Asaas")}
                         </a>
                       ) : (
                         "—"

@@ -48,11 +48,13 @@ describe("nenhuma tag publica sem estar contida na main", () => {
     expect(ramo?.[1]?.split("|").sort()).toEqual(["behind", "identical"]);
   });
 
-  it("a trava NÃO tem `if:` de job — pulada, ela vira `skipped` e o imagens-ok lê isso como reprovação", () => {
+  it("a trava só é executada na origem, como os demais jobs upstream desta distribuição", () => {
     const t = job(publish, "a-tag-veio-da-main");
     // `if:` de STEP é permitido; o que não pode é o `if:` na altura do job
     // (quatro espaços), que faz o GitHub pular o job inteiro.
-    expect(t.split("\n").filter((l) => /^ {4}if:/.test(l))).toEqual([]);
+    expect(t.split("\n").filter((l) => /^ {4}if:/.test(l))).toEqual([
+      "    if: github.repository == 'melgarafael/DeskcommCRM'",
+    ]);
   });
 });
 
@@ -106,7 +108,7 @@ describe("a tag nasce no CI, e nunca do GITHUB_TOKEN", () => {
   });
 
   it("a tag só é criada em push na main, nunca num dispatch de branch qualquer", () => {
-    expect(job(release, "cortar-tag")).toMatch(/if:\s*github\.event_name == 'push'/);
+    expect(job(release, "cortar-tag")).toMatch(/if:\s*github\.repository == 'melgarafael\/DeskcommCRM' && github\.event_name == 'push'/);
     expect(release).toMatch(/push:\s*\n\s*branches:\s*\[main\]/);
   });
 });

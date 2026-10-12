@@ -18,6 +18,8 @@ export const dynamic = "force-dynamic";
  * configurado, nenhum endereço aparece.
  */
 export default async function BillingPage() {
+  const t = (texto: string) => traduzir(texto, idioma);
+
   // spec 13 §4: billing é admin-only (viewer/agent/manager = none).
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
@@ -30,14 +32,18 @@ export default async function BillingPage() {
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Plano e faturamento</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("Plano e faturamento")}</h1>
         <p className="text-sm text-muted-foreground">
           {traduzir("Planos, faturas e cobrança.", idioma)}
         </p>
       </header>
-      <Financeiro orgId={activeOrg.orgId} suporteTemporario={Boolean(user.support)} />
+      <Financeiro
+        orgId={activeOrg.orgId}
+        suporteTemporario={Boolean(user.support)}
+        idioma={idioma}
+      />
       <Card className="max-w-3xl p-6">
-        <h2 className="text-sm font-semibold">Suporte financeiro</h2>
+        <h2 className="text-sm font-semibold">{t("Suporte financeiro")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {suporte ? (
             <>
@@ -57,9 +63,12 @@ export default async function BillingPage() {
           )}
         </p>
       </Card>
-      <section className="vellum-site vellum-billing" aria-label="Catálogo de planos Véllum AI">
-        <p className="vellum-eyebrow">CATÁLOGO COMERCIAL</p>
-        <h2>Um plano para o ritmo da sua empresa.</h2>
+      <section
+        className="vellum-site vellum-billing"
+        aria-label={t("Catálogo de planos Véllum AI")}
+      >
+        <p className="vellum-eyebrow">{t("CATÁLOGO COMERCIAL")}</p>
+        <h2>{t("Um plano para o ritmo da sua empresa.")}</h2>
         <Planos mostrarCadastro={false} planos={planos} />
       </section>
     </div>

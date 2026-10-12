@@ -1,3 +1,5 @@
+import { normalizarIdioma } from "@/lib/i18n/idiomas";
+import { traduzir } from "@/lib/i18n/dicionario";
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { createClient } from "@/lib/supabase/server";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
@@ -31,6 +33,8 @@ import Link from "next/link";
  * deixaria a spec verde medindo nada.
  */
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const t = (texto: string) => traduzir(texto, normalizarIdioma(locale));
+
   const marca = await marcaDaSaida(null);
   // A maioria destas telas roda ANTES do login (não há usuário nenhum), mas
   // duas — `/login/mfa` e, em parte, `/login/recovery` — rodam com uma sessão
@@ -56,24 +60,27 @@ export default async function PublicLayout({ children }: { children: React.React
             )}
           </Link>
           <div>
-            <p className="vellum-eyebrow">CADA CONVERSA TEM UM PRÓXIMO PASSO.</p>
+            <p className="vellum-eyebrow">{t("CADA CONVERSA TEM UM PRÓXIMO PASSO.")}</p>
             <h2>
-              Seu atendimento.
+              {t("Seu atendimento.")}
               <br />
-              Seu conhecimento.
+              {t("Seu conhecimento.")}
               <br />
-              <em>Sua operação.</em>
+              <em>{t("Sua operação.")}</em>
             </h2>
             <p>
-              Entre para acompanhar seus agentes, suas conversas e as oportunidades do seu time.
-              Tudo com o contexto que sua empresa construiu.
+              {t(
+                "Entre para acompanhar seus agentes, suas conversas e as oportunidades do seu time. Tudo com o contexto que sua empresa construiu.",
+              )}
             </p>
           </div>
-          <small>{marca.nome} · Por escrito.</small>
+          <small>
+            {marca.nome} {t(" · Por escrito.")}
+          </small>
         </aside>
-        <section className="vellum-auth-access" aria-label="Acesso à plataforma">
+        <section className="vellum-auth-access" aria-label={t("Acesso à plataforma")}>
           <Link href="/" className="vellum-auth-back">
-            ← Voltar ao site
+            {t("← Voltar ao site")}
           </Link>
           <div className="vellum-auth-form space-y-6">
             {marca.logoUrl && (
@@ -106,8 +113,8 @@ export default async function PublicLayout({ children }: { children: React.React
             {children}
           </div>
           <p className="vellum-auth-bottom">
-            <Link href="/legal/privacy">Privacidade</Link> ·{" "}
-            <Link href="/legal/terms">Termos de uso</Link>
+            <Link href="/legal/privacy">{t("Privacidade")}</Link> ·{" "}
+            <Link href="/legal/terms">{t("Termos de uso")}</Link>
           </p>
         </section>
       </div>

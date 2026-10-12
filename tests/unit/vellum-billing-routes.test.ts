@@ -12,6 +12,9 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
 }));
 vi.mock("@/lib/auth/require-role", () => ({ requireRole: mocks.role }));
+vi.mock("@/lib/impersonate/support", () => ({
+  requireSupportWrite: vi.fn().mockResolvedValue(null),
+}));
 vi.mock("@/lib/audit", () => ({ audit: mocks.audit }));
 vi.mock("@/lib/ai/dispatcher/rate-limit", () => ({ checkRateLimit: mocks.limit }));
 vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: mocks.admin }));

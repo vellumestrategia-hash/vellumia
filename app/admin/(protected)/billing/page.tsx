@@ -1,11 +1,16 @@
+import { traduzir } from "@/lib/i18n/dicionario";
 import { requirePlatformAdmin } from "@/lib/auth/requirePlatformAdmin";
 import { createClient } from "@/lib/supabase/server";
 import type { PlanoFinanceiro } from "@/lib/vellum/financeiro";
 import { EditorPlanos } from "./planos";
+import { normalizarIdioma } from "@/lib/i18n/idiomas";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Planos e assinaturas" };
 export default async function AdminBillingPage() {
-  await requirePlatformAdmin();
+  const t = (texto: string) => traduzir(texto, idioma);
+
+  const ctx = await requirePlatformAdmin();
+  const idioma = normalizarIdioma(ctx.user.user_metadata?.locale as string | undefined);
   const db = await createClient();
   const { data: plans, error } = await db
     .from("billing_plans")
@@ -21,30 +26,32 @@ export default async function AdminBillingPage() {
   return (
     <div className="space-y-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold">Planos e assinaturas</h1>
+        <h1 className="text-2xl font-semibold">{t("Planos e assinaturas")}</h1>
         <p className="text-sm text-muted-foreground">
-          Preços em BRL e orçamento de IA em USD. Mudanças valem para novas contratações.
+          {t("Preços em BRL e orçamento de IA em USD. Mudanças valem para novas contratações.")}
         </p>
       </header>
       {error ? (
-        <p role="alert">Aplique o schema financeiro para editar planos e consultar assinaturas.</p>
+        <p role="alert">
+          {t("Aplique o schema financeiro para editar planos e consultar assinaturas.")}
+        </p>
       ) : (
         <>
           <EditorPlanos planos={plans as PlanoFinanceiro[]} />
           <section>
-            <h2 className="mb-3 font-semibold">Últimas assinaturas · sandbox</h2>
+            <h2 className="mb-3 font-semibold">{t("Últimas assinaturas · sandbox")}</h2>
             {!subscriptions?.length ? (
-              <p className="text-sm text-muted-foreground">Nenhuma assinatura registrada.</p>
+              <p className="text-sm text-muted-foreground">{t("Nenhuma assinatura registrada.")}</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr>
-                      <th className="p-2">Empresa</th>
-                      <th className="p-2">Plano</th>
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Contratação</th>
-                      <th className="p-2">Fim do período</th>
+                      <th className="p-2">{t("Empresa")}</th>
+                      <th className="p-2">{t("Plano")}</th>
+                      <th className="p-2">{t("Status")}</th>
+                      <th className="p-2">{t("Contratação")}</th>
+                      <th className="p-2">{t("Fim do período")}</th>
                     </tr>
                   </thead>
                   <tbody>

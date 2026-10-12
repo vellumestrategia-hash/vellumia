@@ -75,6 +75,10 @@ interface Excecao {
  * linhas da OUTRA organização, não uma leitura como superusuário.
  */
 const PROVA_PROPRIA: readonly Excecao[] = [
+  { tabela: "billing_subscriptions", razao: "tests/invariants/vellum-billing-rls.test.ts — administradores A/B contam uma assinatura própria e zero cruzadas; atendente não lê e cliente não escreve" },
+  { tabela: "billing_invoices", razao: "tests/invariants/vellum-billing-rls.test.ts — leitura positiva local e negativa cruzada A/B por JWT; DML authenticated e leitura anon negados" },
+  { tabela: "billing_conversation_windows", razao: "tests/invariants/vellum-billing-rls.test.ts — consumo positivo local e zero cruzado A/B por JWT; leitura atendente e escrita cliente negadas" },
+  { tabela: "billing_webhook_events", razao: "tests/invariants/vellum-billing-rls.test.ts — recibos server-only: SELECT anon/authenticated negado mesmo com JWT admin A/B, controle positivo service_role" },
   { tabela: "channel_routing_policies", razao: "tests/invariants/channel-routing.test.ts — dois tenants reais, leitura positiva local e negativa cruzada por JWT; FK composta rejeita canal de outra org" },
   { tabela: "channel_routing_responsibles", razao: "tests/invariants/channel-routing.test.ts — JWT do tenant B não lê responsáveis de A; revogação remove vínculo e claim revalida membro ativo" },
   { tabela: "channel_connection_requests", razao: "tests/invariants/channel-routing.test.ts — recibo privado sem SELECT authenticated; reserva admin com MFA e finalização service-only cercada por org e lease" },

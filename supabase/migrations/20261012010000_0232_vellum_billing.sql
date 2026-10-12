@@ -84,11 +84,16 @@ alter table public.billing_conversation_windows enable row level security;
 revoke all on public.billing_plans, public.billing_subscriptions, public.billing_invoices,
   public.billing_webhook_events, public.billing_conversation_windows from public, anon, authenticated;
 grant select on public.billing_plans to authenticated;
+-- Anon só lê as colunas comerciais. Orçamento interno continua sem privilégio.
+grant select (id,name,monthly_price_cents,included_conversations,setup_price_cents,
+  overage_price_cents,enabled) on public.billing_plans to anon;
 grant select on public.billing_subscriptions, public.billing_invoices, public.billing_conversation_windows to authenticated;
 grant all on public.billing_plans, public.billing_subscriptions, public.billing_invoices,
   public.billing_webhook_events, public.billing_conversation_windows to service_role;
 drop policy if exists billing_plans_read on public.billing_plans;
 create policy billing_plans_read on public.billing_plans for select to authenticated using (true);
+drop policy if exists billing_plans_public_read on public.billing_plans;
+create policy billing_plans_public_read on public.billing_plans for select to anon using (enabled);
 drop policy if exists billing_subscriptions_read on public.billing_subscriptions;
 create policy billing_subscriptions_read on public.billing_subscriptions for select to authenticated
  using (public.fn_role_at_least(organization_id,'admin') or public.fn_is_platform_admin());
@@ -101,7 +106,7 @@ create policy billing_windows_read on public.billing_conversation_windows for se
 
 -- Publicação de preços somente: nenhuma coluna de custo/credencial é pública.
 create or replace function public.fn_billing_public_plans() returns jsonb
-language sql stable security definer set search_path = '' as $$
+language sql stable security invoker set search_path = '' as $$
  select coalesce(jsonb_agg(jsonb_build_object(
    'id',id,'name',name,'monthly_price_cents',monthly_price_cents,
    'included_conversations',included_conversations,'setup_price_cents',setup_price_cents,
