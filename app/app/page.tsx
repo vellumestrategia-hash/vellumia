@@ -4,6 +4,8 @@ import { homeDaInterface } from "@/lib/navigation/interface";
 export default async function AppHome() {
   const user = await requireAuth();
   const org = await resolveActiveOrg(user);
+  if (user.is_platform_admin && !user.support && !org) redirect("/admin/dashboard");
+  if (!org) redirect("/get-started");
   redirect(
     homeDaInterface(
       org?.interface_settings,

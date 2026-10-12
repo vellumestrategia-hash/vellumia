@@ -11,15 +11,20 @@
  * da suíte / playwright.config.ts).
  */
 import { test, expect } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 
 import { waitForEmail, extractAuthConfirmLink, uniqueEmail } from "./helpers/auth";
 
-test("criar conta: signup → e-mail de confirmação → onboarding → re-login", async ({
+test("criar conta: confirmação → configuração → CRM → perfil → sair → re-login", async ({
   page,
-  context,
   baseURL,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
+  const evidence = ".superpowers/evidence/vellum-acesso";
+  mkdirSync(evidence, { recursive: true });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
   const email = uniqueEmail("signup");
   const password = "SenhaForte!123";
 
@@ -45,13 +50,52 @@ test("criar conta: signup → e-mail de confirmação → onboarding → re-logi
   await expect(page).toHaveURL(/\/onboarding\/welcome/);
   await expect(page.getByText("Boas-vindas ao Véllum AI")).toBeVisible();
   await expect(page.getByText("Loja E2E Signup")).toBeVisible();
+  await page.screenshot({ path: `${evidence}/01-boas-vindas.png`, fullPage: true });
 
-  // 5. Sai (limpa sessão) e entra de novo com as credenciais criadas
-  await context.clearCookies();
-  await page.goto("/login");
+  // Configuração real pela interface, sem Pular tudo (DEV) nem update direto.
+  // Integrações externas ainda não contratadas podem ser configuradas depois.
+  await page.getByLabel("O que vocês fazem?").fill("Clínica odontológica de teste");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await page.waitForURL("**/onboarding/connect-whatsapp");
+  await page.getByRole("button", { name: /pular por enquanto/i }).click();
+  await page.waitForURL("**/onboarding/setup-ai");
+  await page.getByRole("button", { name: "Pular", exact: true }).click();
+  await page.waitForURL("**/onboarding/funil");
+  await page.getByRole("button", { name: /modelo pronto/i }).click();
+  await page.getByRole("button", { name: /clínica, consultório ou salão/i }).click();
+  await page.getByRole("button", { name: /usar este quadro/i }).click();
+  await page.waitForURL("**/onboarding/testar");
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await page.waitForURL("**/onboarding/invite-team");
+  await page.getByRole("button", { name: /pular por enquanto/i }).click();
+  await page.waitForURL("**/onboarding/done");
+  await page.getByRole("button", { name: "Começar a usar", exact: true }).click();
+  await page.waitForURL("**/app/inbox");
+  await expect(page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link").first()).toBeVisible();
+  await page.screenshot({ path: `${evidence}/02-crm.png`, fullPage: true });
+
+  // Perfil tem entrada no menu da conta, feedback ao salvar e caminho de volta.
+  await page.getByRole("button", { name: "Menu do usuário", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Meu perfil", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Perfil", exact: true })).toBeVisible();
+  await page.getByLabel("Nome completo").fill("Usuário de teste Véllum");
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Perfil atualizado.");
+  await page.setViewportSize({ width: 375, height: 812 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: `${evidence}/03-perfil-mobile.png`, fullPage: true });
+  await page.getByRole("link", { name: "Voltar ao início", exact: true }).click();
+  await page.waitForURL("**/app/inbox");
+
+  // Saída real: além de limpar cookie, comprova a ação e a navegação do menu.
+  await page.getByRole("button", { name: "Menu do usuário", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+  await page.waitForURL("**/login");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL(/\/(app|onboarding)\//, { timeout: 30_000 });
-  await expect(page).not.toHaveURL(/\/login/);
+  await page.waitForURL("**/app/inbox", { timeout: 30_000 });
+  await page.screenshot({ path: `${evidence}/04-retorno-mobile.png`, fullPage: true });
 });

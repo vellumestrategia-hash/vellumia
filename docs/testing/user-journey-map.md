@@ -10,6 +10,14 @@
 
 ## Convenções
 
+Revisão Véllum de 12/10/2026: o primeiro acesso de uma conta de empresa sem
+vínculo caía no Perfil com menu vazio. Reproduzido na sessão real e corrigido
+em `/app` e no layout compartilhado. `primeiro-acesso-sem-organizacao` cobre
+login, URL direta do perfil, configuração e saída; `signup-journey` cobre o
+percurso do cadastro ao CRM, perfil móvel, saída real e novo login. O helper
+de e-mail não reescreve links recebidos. Estado e limites das verificações em
+`docs/vellum/REVISAO-ACESSO-UX.md` e `docs/vellum/CONTINUIDADE.md`.
+
 - `[P0]` primeira impressão — bug aqui é vergonha pública; prioridade máxima.
 - `[P1]` rotina diária do operador/atendente.
 - `[P2]` exploração/edge.

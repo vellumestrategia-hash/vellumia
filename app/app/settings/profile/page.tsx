@@ -1,4 +1,5 @@
 import { requireAuth } from "@/lib/auth/server";
+import Link from "next/link";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { normalizarIdioma } from "@/lib/i18n/idiomas";
 import { SEM_PREFERENCIA_DE_IDIOMA } from "@/lib/schemas/settings";
@@ -27,11 +28,17 @@ export default async function ProfilePage() {
   //                    a troca de idioma da empresa passaria por cima dela.
   const idioma = user.idioma;
   return (
-    <div className="flex h-full flex-col gap-6 p-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <header>
+        <Link
+          href={user.is_platform_admin && !user.support ? "/admin/dashboard" : "/app"}
+          className="mb-4 inline-flex min-h-11 items-center text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+        >
+          {traduzir("Voltar ao início", idioma)}
+        </Link>
         <h1 className="text-2xl font-semibold tracking-tight">{traduzir("Perfil", idioma)}</h1>
         <p className="text-sm text-muted-foreground">
-          {traduzir("Informações pessoais. Email só pode ser trocado em breve.", idioma)}
+          {traduzir("Seus dados pessoais e preferências de acesso.", idioma)}
         </p>
       </header>
       <ProfileForm

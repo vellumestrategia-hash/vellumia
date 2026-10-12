@@ -27,7 +27,7 @@ export function JaEstaPronto({
   const itens: { pronto: boolean; texto: string }[] = [
     {
       pronto: true,
-      texto: t("Servidor no ar e banco de dados instalado"),
+      texto: t("Empresa cadastrada"),
     },
     {
       // Três estados, não dois: cadastrada-e-confirmada, cadastrada-e-sendo-
@@ -46,7 +46,7 @@ export function JaEstaPronto({
       pronto: retrato.whatsapp.transporteApontado,
       texto: retrato.whatsapp.transporteApontado
         ? t("WhatsApp pronto para conectar seu número")
-        : t("O WhatsApp desta instalação ainda não subiu"),
+        : t("Configuração do WhatsApp pendente"),
     },
     {
       pronto: Boolean(retrato.funil),
@@ -64,7 +64,7 @@ export function JaEstaPronto({
       className="rounded-lg border bg-background p-5"
     >
       <h3 id="ja-pronto" className="text-sm font-medium">
-        {t("Você já instalou o sistema. Isto aqui já está de pé:")}
+        {t("Seu espaço de trabalho: o que já está de pé")}
       </h3>
       <ul className="mt-3 space-y-1.5 text-sm">
         {itens.map((it) => (

@@ -61,6 +61,24 @@ Próximo passo desta etapa: concluir Actions do refinamento para o mesmo SHA. Pr
 
 ## Como retomar
 
+### Revisão de acesso e primeira experiência — 12/10/2026
+
+Conta de usuário de empresa reproduziu Perfil com navegação vazia: sessão sem
+membership, e `/app` resolvia o destino pela interface antes de exigir empresa.
+Corrigidos o destino inicial e o gate compartilhado. Administrador sem empresa
+entra na administração pelo login comum e conserva perfil pessoal. O cadastro
+de teste do proprietário foi concluído pela sessão já aberta, criando Véllum
+Estratégia e chegando às boas-vindas; o aceite de termos e as escolhas seguintes
+ficaram com a pessoa. Não houve mudança de senha/papel nem SQL manual novo.
+
+Menu/perfil oferecem início, retorno, validação junto ao campo, feedback e
+responsividade; logo legível no escuro e mensagens iniciais adaptadas a cliente
+SaaS. Plano, provas e limitações em REVISAO-ACESSO-UX.md. Dezoito testes locais
+focados aprovados após a regressão reproduzida. Provas E2E ampliadas para a
+jornada de cadastro ao CRM, perfil/saída/retorno; links reais de e-mail não são
+reescritos pelo helper. Checks completos do novo SHA aguardam Actions. A prova
+descartável não valida entrega no Gmail, WhatsApp/IA reais ou cobrança.
+
 ### Refinamento concluído — código c488914b7e1a13109d0db0d696f5d5556c61a2f4
 
 Em 12/10/2026, todos os checks do código acima foram aprovados: CI verify + invariants no run 38216423478; build de produção e validação pública no run 38216423578; E2E, incluindo as três partes e a conta exclusiva de plataforma, no run 38216423440. Os registros anteriores de checks pendentes/reprovados nesta etapa são histórico, superados por essa execução. As automações upstream de release/imagem continuam intencionalmente sem publicação.

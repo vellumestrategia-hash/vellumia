@@ -1,5 +1,30 @@
 /** Textos públicos e financeiros da distribuição Véllum; pt-BR preserva a chave. */
 export const DICIONARIO_VELLUM = {
+  "Configure sua empresa": { es: "Configura tu empresa" },
+  "Preparar minha empresa": { es: "Preparar mi empresa" },
+  "Sair e usar outra conta": { es: "Salir y usar otra cuenta" },
+  "Seu acesso está pronto. Confirme o nome da empresa para preparar seu espaço de trabalho. Depois, você poderá configurar o WhatsApp, os agentes e sua equipe.": {
+    es: "Tu acceso está listo. Confirma el nombre de la empresa para preparar tu espacio de trabajo. Después podrás configurar WhatsApp, los agentes y tu equipo.",
+  },
+  "Seus dados pessoais e preferências de acesso.": { es: "Tus datos personales y preferencias de acceso." },
+  "Voltar ao início": { es: "Volver al inicio" },
+  "Meu perfil": { es: "Mi perfil" },
+  "Este é o e-mail usado para entrar na sua conta.": { es: "Este es el correo que usas para entrar en tu cuenta." },
+  "Link da foto (opcional)": { es: "Enlace de la foto (opcional)" },
+  "Cole o link direto de uma imagem. Deixe em branco para usar suas iniciais. O endereço do site da empresa não é uma foto.": {
+    es: "Pega el enlace directo de una imagen. Déjalo vacío para usar tus iniciales. La dirección del sitio de la empresa no es una foto.",
+  },
+  "Informe uma URL válida para a foto ou deixe o campo em branco.": { es: "Escribe una URL válida para la foto o deja el campo vacío." },
+  "Use até 120 caracteres para seu nome.": { es: "Usa hasta 120 caracteres para tu nombre." },
+  "Confira o valor deste campo.": { es: "Revisa el valor de este campo." },
+  "Sua sessão expirou. Entre novamente para salvar.": { es: "Tu sesión expiró. Entra de nuevo para guardar." },
+  "Não foi possível salvar seu perfil. Tente novamente.": { es: "No se pudo guardar tu perfil. Inténtalo de nuevo." },
+  "Seu espaço de trabalho: o que já está de pé": { es: "Tu espacio de trabajo: lo que ya está listo" },
+  "Empresa cadastrada": { es: "Empresa registrada" },
+  "Configuração do WhatsApp pendente": { es: "Configuración de WhatsApp pendiente" },
+  "Não foi possível concluir o acesso por este link. Se você já confirmou o e-mail, entre com sua senha. Caso contrário, fale com o suporte para concluir seu cadastro.": {
+    es: "No se pudo completar el acceso con este enlace. Si ya confirmaste el correo, entra con tu contraseña. Si no, contacta con soporte para completar tu registro.",
+  },
   "Buscar empresas": { es: "Buscar empresas" },
   "Carregando empresas": { es: "Cargando empresas" },
   "Em configuração": { es: "En configuración" },

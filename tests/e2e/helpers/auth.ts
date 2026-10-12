@@ -59,21 +59,18 @@ export async function waitForEmail(
 }
 
 /**
- * Extrai o link /auth/confirm do HTML do e-mail e reescreve a origin para a
- * baseURL sob teste (o SiteURL/RedirectTo do GoTrue pode apontar para outra
- * porta em dev — o token_hash é o que importa).
+ * Extrai o link real do e-mail. Não conserta origem ou caminho: isto escondia
+ * uma allowlist de redirecionamento errada e aprovava um e-mail que o usuário
+ * não conseguiria abrir. O provedor do teste precisa estar configurado.
  */
 export function extractAuthConfirmLink(html: string, baseUrl: string): string {
-  // Se o redirect_to não está na allowlist do GoTrue, o link cai no site_url
-  // sem o path /auth/confirm — por isso ancoramos no token_hash e remontamos a
-  // URL contra a baseURL sob teste (o token é o que importa).
   const m = html.match(/href="([^"]*token_hash=[^"]*)"/);
   if (!m) throw new Error("link com token_hash não encontrado no e-mail");
   const href = m[1]!.replace(/&amp;/g, "&");
   const url = new URL(href);
-  const base = new URL(baseUrl);
-  url.protocol = base.protocol;
-  url.host = base.host;
-  url.pathname = "/auth/confirm";
+  if (url.origin !== new URL(baseUrl).origin || url.pathname !== "/auth/confirm") {
+    throw new Error("O e-mail aponta para outro endereço. Confira Site URL e Redirect URLs do provedor de teste.");
+  }
+  if (!url.searchParams.get("type")) throw new Error("O e-mail não informa o tipo de confirmação.");
   return url.toString();
 }

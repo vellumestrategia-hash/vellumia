@@ -6,6 +6,8 @@ import { branding } from "@/lib/branding";
 import { RecoverOrganizationForm } from "@/components/auth/RecoverOrganizationForm";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
+import { signOut } from "@/app/actions/auth/signOut";
+import { Button } from "@/components/ui/button";
 
 /**
  * A saída do beco: quem confirmou o e-mail e ficou sem organização termina o
@@ -16,13 +18,14 @@ import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
  * entra em `lib/navigation/registry.ts` nem na allowlist de
  * `tests/unit/navegacao-completude.test.ts`, cujo escopo é a navegação do
  * tenant. As portas são os três desvios que levam até aqui: os dois de
- * `app/onboarding/` e o estado vazio do Inbox.
+ * `app/onboarding/` e o gate compartilhado de `app/app/layout.tsx`.
  */
 export const dynamic = "force-dynamic";
 
 export default async function GetStartedPage() {
   const user = await requireAuth();
   const activeOrg = await resolveActiveOrg(user);
+  if (user.is_platform_admin && !user.support && !activeOrg) redirect("/admin/dashboard");
   // Quem já tem organização não passa por aqui: sem isto, a tela viraria um
   // "abra outra empresa" alcançável por quem digitasse a URL.
   if (activeOrg) redirect("/app/inbox");
@@ -51,15 +54,20 @@ export default async function GetStartedPage() {
               {branding().name}
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">
-              {t("Configure sua organização")}
+              {t("Configure sua empresa")}
             </h1>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {t(
-                "Sua conta foi confirmada, mas a organização inicial ainda não foi criada. Informe o nome da sua empresa para concluir o primeiro acesso e abrir o onboarding do CRM.",
+                "Seu acesso está pronto. Confirme o nome da empresa para preparar seu espaço de trabalho. Depois, você poderá configurar o WhatsApp, os agentes e sua equipe.",
               )}
             </p>
           </div>
           <RecoverOrganizationForm nomeSugerido={nomeSugerido} />
+          <form action={signOut}>
+            <Button variant="ghost" className="w-full" type="submit">
+              {t("Sair e usar outra conta")}
+            </Button>
+          </form>
           <p className="text-xs leading-relaxed text-muted-foreground">
             {t(
               "Se você recebeu um convite, não crie uma organização nova. Use o link do convite ou peça ao administrador para reenviá-lo.",

@@ -55,18 +55,20 @@ export function RecoverOrganizationForm({ nomeSugerido }: { nomeSugerido?: strin
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoComplete="organization"
+          maxLength={120}
           autoFocus
           disabled={isPending}
           aria-invalid={Boolean(error)}
+          aria-describedby={error ? "recovery-org-error" : undefined}
         />
       </div>
       {error && (
-        <p className="text-sm text-destructive" role="alert">
+        <p id="recovery-org-error" className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}
       <Button className="w-full" type="submit" disabled={isPending || name.trim().length < 2}>
-        {isPending ? t("Preparando seu ambiente…") : t("Continuar para o onboarding")}
+        {isPending ? t("Preparando seu ambiente…") : t("Preparar minha empresa")}
       </Button>
     </form>
   );

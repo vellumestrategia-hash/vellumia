@@ -1,5 +1,6 @@
 "use client";
 import { useTransition } from "react";
+import Link from "next/link";
 import { useUser, useAuth } from "@/hooks/auth/AuthProvider";
 import {
   DropdownMenu,
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SeletorDeIdioma } from "@/components/shell/SeletorDeIdioma";
 import { useT } from "@/hooks/i18n/useT";
-import { SignOut } from "@/lib/ui/icons";
+import { House, SignOut, UserCircle } from "@/lib/ui/icons";
 
 function initials(name: string | null, email: string): string {
   if (name && name.trim()) {
@@ -26,7 +27,7 @@ function initials(name: string | null, email: string): string {
 export function UserMenu() {
   const t = useT();
   const user = useUser();
-  const { signOut } = useAuth();
+  const { signOut, activeOrg } = useAuth();
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -49,6 +50,19 @@ export function UserMenu() {
               <span className="truncate text-xs text-muted-foreground">{user.email}</span>
             </div>
           </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href={user.is_platform_admin && !user.support && !activeOrg ? "/admin/dashboard" : "/app"}>
+              <House size={16} className="mr-2" aria-hidden />
+              {t("Voltar ao início")}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/app/settings/profile">
+              <UserCircle size={16} className="mr-2" aria-hidden />
+              {t("Meu perfil")}
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem disabled={isPending} onClick={() => startTransition(async () => { await signOut(); })}>
             <SignOut size={16} className="mr-2" aria-hidden />

@@ -129,7 +129,7 @@ test.describe("conta confirmada e sem organização", () => {
     await entrar(page, emailOrfao);
     await page.goto("/onboarding");
     await expect(page).toHaveURL(/\/get-started/, { timeout: 20_000 });
-    await expect(page.getByRole("heading", { name: /Configure sua organização/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Configure sua empresa/i })).toBeVisible();
   });
 
   test("⭐ a porta do welcome (o layout) leva ao mesmo lugar", async ({ page }) => {
@@ -140,15 +140,21 @@ test.describe("conta confirmada e sem organização", () => {
     await expect(page).toHaveURL(/\/get-started/, { timeout: 20_000 });
   });
 
-  test("⭐ o estado vazio do Inbox oferece a porta, e ela funciona", async ({ page }) => {
-    // A frase antiga oferecia duas saídas que não existem para quem instalou o
-    // sistema. O link é a única saída real — e clicá-lo tem de chegar lá.
+  test("o Inbox sem empresa vai direto à configuração, com saída da conta", async ({ page }) => {
     await entrar(page, emailOrfao);
     await page.goto("/app/inbox");
-    const porta = page.getByRole("link", { name: /Configurar minha organização/i });
-    await expect(porta).toBeVisible({ timeout: 20_000 });
-    await porta.click();
     await expect(page).toHaveURL(/\/get-started/, { timeout: 20_000 });
+    await expect(page.getByRole("button", { name: "Sair e usar outra conta" })).toBeVisible();
+  });
+
+  test("regressão: login e perfil sem empresa não mostram uma navegação vazia", async ({ page }) => {
+    await entrar(page, emailOrfao);
+    await expect(page).toHaveURL(/\/get-started/, { timeout: 20_000 });
+    await page.goto("/app/settings/profile");
+    await expect(page).toHaveURL(/\/get-started/);
+    await expect(page.getByRole("heading", { name: "Configure sua empresa" })).toBeVisible();
+    await page.getByRole("button", { name: "Sair e usar outra conta" }).click();
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test("⭐ a recuperação CONCLUI: informa o nome e sai para o onboarding", async ({ page }) => {
@@ -157,7 +163,7 @@ test.describe("conta confirmada e sem organização", () => {
     await entrar(page, emailOrfao);
     await page.goto("/get-started");
     await page.getByLabel(/Nome da empresa/i).fill("Clínica Recuperada E2E");
-    await page.getByRole("button", { name: /Continuar para o onboarding/i }).click();
+    await page.getByRole("button", { name: /Preparar minha empresa/i }).click();
 
     await expect(page).toHaveURL(/\/onboarding\/welcome/, { timeout: 40_000 });
 
@@ -193,7 +199,7 @@ test.describe("CONTROLE — quem já tem organização não é mandado para a sa
     await entrar(page, emailComOrg);
     await page.goto("/get-started");
     await expect(page).toHaveURL(/\/app\/inbox/, { timeout: 20_000 });
-    await expect(page.getByRole("heading", { name: /Configure sua organização/i })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: /Configure sua empresa/i })).toHaveCount(0);
   });
 
   test("o onboarding de quem tem organização NÃO cai no /get-started", async ({ page }) => {

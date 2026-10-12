@@ -895,6 +895,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      - name: Evidências da jornada de cadastro e acesso Véllum
+        uses: actions/upload-artifact@v7
+        if: always() && matrix.parte == 1
+        with:
+          name: vellum-acesso-${{ github.sha }}
+          path: .superpowers/evidence/vellum-acesso/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - uses: actions/upload-artifact@v7
         if: failure()
         with:

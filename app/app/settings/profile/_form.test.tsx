@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
@@ -54,4 +54,14 @@ describe("ProfileForm em espanhol", () => {
     expect(traduzir("Escreva uma mensagem…", "es")).toBe("Escribe un mensaje…");
     expect(traduzir("Escolha um modelo aprovado…", "es")).toBe("Elige una plantilla aprobada…");
   });
+});
+
+it("mostra a validação ao lado do endereço da foto, com relação acessível", () => {
+  const { container } = renderForm("pt-BR", "pt-BR");
+  const foto = screen.getByLabelText(/(Avatar URL|Link da foto)/i);
+  fireEvent.change(foto, { target: { value: "isto-nao-e-um-link" } });
+  fireEvent.submit(container.querySelector("form")!);
+  expect(foto).toHaveAttribute("aria-invalid", "true");
+  expect(screen.getByRole("alert")).toHaveTextContent("Informe uma URL válida para a foto");
+  expect(foto).toHaveAttribute("aria-describedby", expect.stringContaining("avatar-error"));
 });

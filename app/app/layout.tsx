@@ -24,6 +24,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/login");
 
   let activeOrg = await resolveActiveOrg(user);
+  // Toda porta do CRM precisa de uma empresa. Antes, o login caía no perfil
+  // com uma barra lateral vazia; a pessoa tinha sessão, mas nenhuma saída.
+  // O administrador da plataforma conserva suas configurações pessoais.
+  if (!activeOrg && !user.is_platform_admin) redirect("/get-started");
 
   /**
    * A cor desta organização, serializada, ou `null` quando ela não tem uma.

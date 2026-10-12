@@ -113,6 +113,7 @@ describe("/auth/confirm nomeia a causa da recusa", () => {
       "utf8",
     );
     expect(fonte).toContain('error === "template_padrao"');
-    expect(fonte).toContain("marca-emails.sh");
+    expect(fonte).toContain("entre com sua senha");
+    expect(fonte).not.toContain("<code>marca-emails.sh</code>");
   });
 });

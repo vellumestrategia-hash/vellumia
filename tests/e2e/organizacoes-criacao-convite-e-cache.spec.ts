@@ -21,7 +21,8 @@ test("admin de plataforma sem empresa navega no desktop e celular com foco e sa√
     if (admin.error) throw admin.error;
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
-    await page.goto("/login?next=/admin/dashboard");
+    // Login comum tamb√©m reconhece o administrador sem precisar de ?next.
+    await page.goto("/login");
     await page.getByLabel(/e-?mail/i).fill(email);
     await page.getByLabel(/senha/i).fill(password);
     await page.getByRole("button", { name: /entrar/i }).click();
