@@ -61,6 +61,29 @@ Próximo passo desta etapa: concluir Actions do refinamento para o mesmo SHA. Pr
 
 ## Como retomar
 
+### Resend e onboarding administrativo — 12/10/2026
+
+Resend cadastrado na sessão indicada pelo proprietário: domínio
+auth.vellumestrategia.com.br, região São Paulo, ID
+ed191c77-6ec0-47a8-a2d3-b265d301fd75. TXT DKIM e dois CNAMEs foram adicionados
+na HostGator e conferidos exatamente no DNS público. Leitura final Resend:
+DKIM, CNAMEs e domínio Verified; eventos DNS verified e Domain verified.
+Não repetir cadastro nem substituir DNS correto. SMTP personalizado e modelos
+de confirmação/recuperação já aceitos pela Management API do Supabase, com
+confirmação de e-mail obrigatória preservada. Pedido de recuperação aceito pelo
+Supabase e Delivered no Resend para o e-mail administrador indicado, sem consumir
+link nem alterar senha. URLs ainda locais (localhost:3010); mudar para origem
+HTTPS quando a publicação for decidida. A chave anterior foi desconsiderada; nenhuma chave
+em arquivo versionado. Estado completo e provas locais em RESEND.md.
+
+Pedido de implementação do onboarding interno recebido em arquivo colado
+e1b9c962-b913-43ac-8f3f-02f0a046a987. Em análise arquitetural; ainda sem código
+novo ou migration aplicada. Reusar requirePlatformAdmin (escopo full),
+event_log/register-handlers, ai_knowledge_sources/rag-indexer, ai-policy privado,
+ai_agents/versions e testAgentVersion (sandbox real). O editor de clientes nunca
+deve exibir a ferramenta interna. Provas da funcionalidade devem usar dados
+descartáveis e provedores simulados, sem credenciais reais ou deploy de produção.
+
 ### Revisão de acesso aprovada — código ee6e6f76fad756fac32ba79fcd46a5662da1550c
 
 Em 12/10/2026, os checks desse código terminaram aprovados: CI 38282582626

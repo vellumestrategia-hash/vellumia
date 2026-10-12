@@ -1,16 +1,32 @@
 # E-mails de acesso da Véllum AI — Resend Free
 
-Estado em 12/10/2026: opção gratuita escolhida pelo proprietário. A conexão
-SMTP ainda não foi aplicada; falta cadastrar e verificar o domínio de envio.
-O Supabase mantém a confirmação de e-mail obrigatória.
+Estado em 12/10/2026: domínio `auth.vellumestrategia.com.br` cadastrado na conta
+Resend autenticada pelo proprietário, região São Paulo. Os três registros foram
+adicionados na zona HostGator e conferidos no DNS público. DKIM, os dois CNAMEs
+e o domínio estão Verified no Resend. Eventos DNS verified às 15:09 e Domain
+verified às 15:12 no horário local; domínio pronto para envio.
+
+SMTP personalizado aplicado no Supabase, com a chave nova indicada pelo
+proprietário e remetente `acesso@auth.vellumestrategia.com.br`. Modelos de
+confirmação e recuperação aplicados com marca e contrato RedirectTo/TokenHash.
+Leitura de retorno confirmou host, porta 465, remetente e ambos os modelos.
+A confirmação de e-mail continua obrigatória. Pedido de recuperação via Supabase
+Auth para o e-mail administrador indicado pelo proprietário aceito sem erro.
+O painel Resend mostrou Delivered para esse e-mail, assunto "Redefina sua senha
+- Véllum AI", ID 01a13154-76d9-7891-9edf-515c91dc0855. Nenhum link foi consumido
+nem senha alterada. Delivered comprova aceite pelo servidor de destino; caixa de
+entrada/spam e a troca de senha continuam dependentes da ação do proprietário.
+O percurso completo de confirmação/recuperação já tem prova descartável em CI;
+esse envio prova a conexão SMTP real, sem criar usuários de teste no projeto real.
 
 O proprietário confirmou acesso ao painel do domínio e forneceu uma chave
 restrita a envio. A consulta de domínios recebeu HTTP 401 `restricted_api_key`
 com a mensagem de restrição a envio; isso não significa chave inválida.
-Ela foi mantida somente em memória privada, sem arquivo ou commit.
-O painel do Resend no Chrome ainda mostra login. Foi solicitado que o
-proprietário abra Domains na mesma conta dessa chave e deixe o painel
-autenticado, para cadastrar o domínio sem ampliar as permissões da chave.
+A chave anterior foi desconsiderada a pedido do proprietário. A substituta
+também é limitada ao envio: cadastro de domínio foi realizado pela sessão
+autenticada do navegador interno, sem ampliar seu acesso. Nenhuma chave foi
+gravada no Git ou nesta documentação; a substituta foi armazenada no campo
+privado de senha SMTP do Supabase para a conexão autorizada.
 
 ## O que é necessário
 
@@ -25,9 +41,9 @@ A consulta pública de DNS em 12/10/2026 retornou `dns3.hostgator.com.br` e
 essa zona deve permitir adicionar os registros; a consulta não comprova
 que o proprietário já possui acesso a esse painel.
 
-Proposta de remetente, ainda não cadastrada:
+Remetente configurado:
 
-| Campo | Valor proposto |
+| Campo | Valor |
 | --- | --- |
 | Domínio de envio | `auth.vellumestrategia.com.br` |
 | Endereço de envio | `acesso@auth.vellumestrategia.com.br` |
@@ -36,6 +52,20 @@ Proposta de remetente, ainda não cadastrada:
 O subdomínio mantém os e-mails de acesso separados dos outros envios da marca.
 O remetente acima não é uma caixa de suporte. Se houver necessidade de receber
 respostas, usar um endereço atendido pela equipe na configuração adequada.
+
+Domínio Resend: `ed191c77-6ec0-47a8-a2d3-b265d301fd75`. Registros criados:
+
+| Tipo | Nome na HostGator | Valor |
+| --- | --- | --- |
+| TXT | `resend._domainkey.auth` | Chave DKIM pública gerada para esse domínio; comparação exata com DNS público aprovada |
+| CNAME | `rsend.auth` | `rsend-sae1.forge.rmta.net` |
+| CNAME | `send.auth` | `send.forge.rmta.net` |
+
+TTL 14400, padrão do painel. O TXT completo e as provas ficam em
+`C:/Users/Lenovo/.codex/tmp/VellumAI-auth/REGISTROS-RESEND.md` e
+`hostgator-dns.jpg`, fora do Git. Registros de site, Brevo e Titan existentes
+foram preservados. Recebimento pelo Resend e subdomínio de tracking não foram
+ativados; a aba Configuration oferece criar tracking, sem subdomínio existente.
 
 ## Conta e DNS
 
@@ -77,8 +107,10 @@ essa conexão não exige adicionar outra biblioteca ao sistema.
 Depois de ativar o SMTP, aplicar os modelos de confirmação e recuperação de
 `supabase/templates`, renderizados com a marca Véllum. Os links precisam
 preservar `RedirectTo` e `TokenHash` conforme o contrato de `/auth/confirm`.
-O Supabase recusou a alteração de modelos enquanto o projeto Free usava
-o remetente padrão; a tentativa anterior não foi aplicada.
+O Supabase havia recusado os modelos com o remetente padrão. Depois de salvar
+o SMTP personalizado, a alteração dos dois modelos foi aceita no plano Free.
+Na Management API, `smtp_port` é string (`"465"`); número foi recusado sem aplicar
+a alteração. Nenhuma regra de autenticação ou limite foi desativada.
 
 ## Endereços e prova de funcionamento
 
