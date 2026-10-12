@@ -4,6 +4,8 @@
  */
 export const PUBLIC_PATHS: RegExp[] = [
   /^\/$/,
+  // Catálogo comercial público; não contém dados de empresas.
+  /^\/precos$/,
   /^\/login(\/.*)?$/,
   /^\/signup$/,
   /^\/auth\/confirm$/,

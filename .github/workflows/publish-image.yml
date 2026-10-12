@@ -63,6 +63,7 @@ jobs:
   # renomeada para `jmpo/v1.4.0` justamente para não colidir com a numeração
   # daqui.
   a-tag-veio-da-main:
+    if: github.repository == 'melgarafael/DeskcommCRM'
     runs-on: ubuntu-latest
     # Sem o bloco, o token herda o default do REPOSITÓRIO — configuração que vive
     # fora do repo. Mesma razão do `permissions: {}` de `imagens-ok`.
@@ -95,6 +96,7 @@ jobs:
           esac
 
   build-and-push:
+    if: github.repository == 'melgarafael/DeskcommCRM'
     needs: [a-tag-veio-da-main]
     runs-on: ubuntu-latest
     permissions:
@@ -218,6 +220,7 @@ jobs:
   # depois disso é esperado (não há Supabase aqui) e não reprova — o que
   # reprova é o processo não chegar a servir.
   imagem-do-app-sobe:
+    if: github.repository == 'melgarafael/DeskcommCRM'
     needs: [a-tag-veio-da-main]
     runs-on: ubuntu-latest
     permissions:
@@ -325,7 +328,7 @@ jobs:
     # velho sobre banco já migrado. Sem `tag`, um dispatch numa branch moveria o
     # canal. Sem o `v`, uma tag de teste o move (o registro já tem uma
     # `quebrada-teste`, que nenhum push na main consegue produzir).
-    if: github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    if: github.repository == 'melgarafael/DeskcommCRM' && github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     runs-on: ubuntu-latest
     permissions:
       # O menor escopo que faz o trabalho: reapontar tag no GHCR. Sem o bloco, o
@@ -365,7 +368,7 @@ jobs:
   # gerado, e acrescentar uma quarta imagem um dia quebraria o gate em silêncio —
   # o merge voltaria a passar sem que ninguém tivesse decidido isso.
   imagens-ok:
-    if: always()
+    if: always() && github.repository == 'melgarafael/DeskcommCRM'
     runs-on: ubuntu-latest
     # Nenhuma permissão: este job só lê o resultado de `needs` e sai. Sem o bloco,
     # o GITHUB_TOKEN herdaria o default do REPOSITÓRIO — configuração que vive fora

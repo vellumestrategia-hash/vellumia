@@ -1,8 +1,8 @@
 {
-  "name": "deskcomm-crm",
+  "name": "vellum-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "DeskcommCRM — sistema operacional de vendas open source com agentes de IA nativos e WhatsApp (WAHA). Self-hosted, multi-tenant, LGPD by-design.",
+  "description": "Véllum AI — plataforma de agentes comerciais, WhatsApp e CRM multiempresa. Adaptação MIT do DeskcommCRM.",
   "engines": {
     "node": ">=22"
   },
@@ -94,6 +94,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",

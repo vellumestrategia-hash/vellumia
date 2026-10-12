@@ -5,6 +5,11 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 # O GITHUB_TOKEN deste job serve a `actions/checkout` (clone) e a
 # `actions/setup-node` (manifest de `actions/node-versions`, repo público).
@@ -17,7 +22,33 @@ permissions:
 jobs:
   build-and-size:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      NEXT_TELEMETRY_DISABLED: "1"
+      SENTRY_DSN: "off"
+      VELLUM_LOW_MEMORY_BUILD: "true"
+      VELLUM_BILLING_ENFORCEMENT: "false"
+      # Somente placeholders; nenhum ambiente da empresa é acessado no CI.
+      NEXT_PUBLIC_SUPABASE_URL: https://test-placeholder.invalid
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-placeholder-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: test-placeholder-service-role-key
+      NEXT_PUBLIC_APP_URL: http://localhost:3010
+      APP_URL: http://localhost:3010
+      ADMIN_URL: http://localhost:3010
+      APP_NAME: Véllum AI
+      APP_LOGO_URL: /brand/vellum-wordmark.svg
+      APP_ACCENT_HEX: "#9E2B25"
+      INTERNAL_SECRET: ci-placeholder-nao-e-segredo
+      CPF_ENCRYPTION_KEY: ci-placeholder-nao-e-segredo
+      WAHA_BYO_ENCRYPTION_KEY: ci-placeholder-nao-e-segredo
+      AI_CRED_AES_KEY: ci-placeholder-nao-e-segredo
+      SUPABASE_DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      WAHA_API_BASE_URL: http://127.0.0.1:3001
+      WAHA_API_KEY: ci-placeholder-nao-e-segredo
+      WAHA_WEBHOOK_BASE_URL: http://127.0.0.1:3010
+      UPSTASH_REDIS_REST_URL: http://127.0.0.1:3998
+      UPSTASH_REDIS_REST_TOKEN: ci-placeholder-nao-e-segredo
     steps:
       - uses: actions/checkout@v7
 
@@ -27,7 +58,7 @@ jobs:
         timeout-minutes: 5
 
       - name: Build
-        run: pnpm build
+        run: pnpm exec next build --webpack
         env:
           NEXT_TELEMETRY_DISABLED: "1"
           # "off", não vazio: vazio seleciona o Sentry DA COMUNIDADE
@@ -35,6 +66,43 @@ jobs:
           # com aspas vazias ela não era alcançada — o build seguia com o DSN
           # padrão embutido.
           SENTRY_DSN: "off"
+
+      - name: Chromium para validação pública
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Páginas públicas e acessibilidade em produção
+        run: |
+          set -euo pipefail
+          pnpm exec next start --port 3010 > /tmp/vellum-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:3010/login > /dev/null; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != true ]; then
+            cat /tmp/vellum-next.log
+            exit 1
+          fi
+          node scripts/vellum-validar-publico.mjs
+
+      - name: Evidências da validação pública
+        # Só publica screenshots produzidos pela validação deste SHA.
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vellum-publico-${{ github.sha }}
+          path: |
+            docs/vellum/evidencias/validacao-publica.json
+            docs/vellum/evidencias/landing-*.png
+            docs/vellum/evidencias/precos-*.png
+            docs/vellum/evidencias/login-*.png
+            docs/vellum/evidencias/cadastro-*.png
+          retention-days: 7
 
       - name: Report bundle sizes
         run: |

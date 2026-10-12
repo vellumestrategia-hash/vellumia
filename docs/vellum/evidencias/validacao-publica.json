@@ -1,0 +1,44 @@
+{
+  "data": "2026-10-12T01:47:00.291Z",
+  "base": "http://localhost:3010",
+  "resultados": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "rotas": [
+        "/",
+        "/precos",
+        "/login",
+        "/signup",
+        "/app → /login"
+      ],
+      "overflow": false,
+      "erros": 0,
+      "axe_landing": 0,
+      "axe_precos": 0,
+      "axe_login": 0,
+      "axe_cadastro": 0
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "rotas": [
+        "/",
+        "/precos",
+        "/login",
+        "/signup",
+        "/app → /login"
+      ],
+      "overflow": false,
+      "erros": 0,
+      "axe_landing": 0,
+      "axe_precos": 0,
+      "axe_login": 0,
+      "axe_cadastro": 0
+    }
+  ]
+}

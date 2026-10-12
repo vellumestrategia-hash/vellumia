@@ -43,6 +43,7 @@ import {
 import type { DesfechoDoAviso } from "@/lib/agent-engine/agent/aviso-de-escalacao";
 import { corpoDoBloqueio } from "@/lib/agent-engine/edge/llm/orcamento";
 import { LlmBudgetExceededError } from "@/lib/agent-engine/edge/llm/run-model-call";
+import { BillingAccessDeniedError } from "@/lib/vellum/billing-access";
 
 const RAIZ = process.cwd();
 const INBOUND = join(RAIZ, "lib/agent-engine/agent/inbound-turn.ts");
@@ -104,11 +105,32 @@ function sqlsDoHandoff(chamadas: Array<{ sql: string }>): string[] {
 }
 
 describe("a escolta do orçamento", () => {
+  it("assinatura bloqueada devolve ao humano com causa financeira e checkpoint", async () => {
+    const { pool, chamadas } = poolFalso();
+    const error = new BillingAccessDeniedError("subscription");
+    const avisar = avisoEspiao();
+    await expect(
+      comHandoffSeOrcamentoAcabar(contexto(pool, logFalso(), avisar), async () => {
+        throw error;
+      }),
+    ).rejects.toBe(error);
+    expect(avisar).toHaveBeenCalledOnce();
+    expect(chamadas.find((c) => c.sql.includes("set force_human = true"))?.params).toEqual([
+      ORG,
+      LEAD,
+    ]);
+    const inbox = chamadas.find((c) => c.sql.includes("insert into agent_inbox_items"));
+    expect(String(inbox?.params[2])).toContain(error.message);
+    expect(String(inbox?.params[2])).toContain(RESUMO_DO_CHECKPOINT);
+  });
   it("caminho feliz: devolve o valor e não escreve nada no banco", async () => {
     const { pool, chamadas } = poolFalso();
     const log = logFalso();
 
-    const devolvido = await comHandoffSeOrcamentoAcabar(contexto(pool, log), async () => "turno ok");
+    const devolvido = await comHandoffSeOrcamentoAcabar(
+      contexto(pool, log),
+      async () => "turno ok",
+    );
 
     expect(devolvido).toBe("turno ok");
     expect(chamadas, "handoff disparado num turno que deu certo").toEqual([]);
@@ -171,7 +193,9 @@ describe("a escolta do orçamento", () => {
       throw new LlmBudgetExceededError();
     });
 
-    await expect(comHandoffSeOrcamentoAcabar(contexto(pool, logFalso()), chamada)).rejects.toThrow();
+    await expect(
+      comHandoffSeOrcamentoAcabar(contexto(pool, logFalso()), chamada),
+    ).rejects.toThrow();
 
     // A callback é a ÚNICA porta para o modelo nesta função, e ela rodou uma vez
     // (a que falhou). Gerar o resumo por LLM seria gastar exatamente o que acabou
@@ -216,7 +240,10 @@ describe("a escolta do orçamento", () => {
     expect(avisar, "escolta que silencia sem avisar é o defeito original").toHaveBeenCalledTimes(1);
 
     const iForceHuman = chamadas.findIndex((c) => c.sql.includes("set force_human = true"));
-    expect(iForceHuman, "sem force_human não há passagem para medir a ordem contra").toBeGreaterThanOrEqual(0);
+    expect(
+      iForceHuman,
+      "sem force_human não há passagem para medir a ordem contra",
+    ).toBeGreaterThanOrEqual(0);
     expect(
       avisadoNaChamada,
       "o aviso saiu DEPOIS de force_human — a trava que ele acabou de armar veta o envio",
@@ -228,7 +255,10 @@ describe("a escolta do orçamento", () => {
     // jeito, mas quem for assumir precisa saber que o cliente está esperando sem
     // ter sido avisado — é o que muda a primeira frase que o atendente digita.
     const { pool, chamadas } = poolFalso();
-    const avisar = vi.fn(async (): Promise<DesfechoDoAviso> => ({ avisado: false, porque: "outside_window" }));
+    const avisar = vi.fn(async (): Promise<DesfechoDoAviso> => ({
+      avisado: false,
+      porque: "outside_window",
+    }));
 
     await expect(
       comHandoffSeOrcamentoAcabar(contexto(pool, logFalso(), avisar), async () => {
@@ -298,14 +328,34 @@ function chamadasDoNucleo(texto: string) {
   const ast = ts.createSourceFile("inbound.ts", texto, ts.ScriptTarget.Latest, true);
   const chamadas: Array<{ tipo: "operacional" | "preview" | "sem_escolta"; texto: string }> = [];
   const visit = (node: ts.Node) => {
-    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "executarTurnoDoAgente") {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isIdentifier(node.expression) &&
+      node.expression.text === "executarTurnoDoAgente"
+    ) {
       const ancestors: ts.Node[] = [];
       for (let p = node.parent; p; p = p.parent) ancestors.push(p);
       const owner = ancestors.find(ts.isFunctionDeclaration)?.name?.text;
-      const escoltado = ancestors.some(p => ts.isCallExpression(p) && ts.isIdentifier(p.expression) && p.expression.text === "comHandoffSeOrcamentoAcabar");
-      const preview = owner === "runAgentPreview" && node.arguments.length === 6 &&
-        node.arguments[1]?.kind === ts.SyntaxKind.NullKeyword && node.arguments[5]?.getText(ast) === "preview";
-      chamadas.push({ tipo: owner === "runAgentTurn" && escoltado ? "operacional" : preview ? "preview" : "sem_escolta", texto: node.getText(ast) });
+      const escoltado = ancestors.some(
+        (p) =>
+          ts.isCallExpression(p) &&
+          ts.isIdentifier(p.expression) &&
+          p.expression.text === "comHandoffSeOrcamentoAcabar",
+      );
+      const preview =
+        owner === "runAgentPreview" &&
+        node.arguments.length === 6 &&
+        node.arguments[1]?.kind === ts.SyntaxKind.NullKeyword &&
+        node.arguments[5]?.getText(ast) === "preview";
+      chamadas.push({
+        tipo:
+          owner === "runAgentTurn" && escoltado
+            ? "operacional"
+            : preview
+              ? "preview"
+              : "sem_escolta",
+        texto: node.getText(ast),
+      });
     }
     ts.forEachChild(node, visit);
   };
@@ -319,21 +369,32 @@ describe("o call site — AST separa prévia sem job do turno operacional escolt
 
   it("há uma única entrada operacional escoltada e uma prévia explicitamente sem job", () => {
     const calls = chamadasDoNucleo(fonteInbound);
-    expect(calls.map(c => c.tipo).sort()).toEqual(["operacional", "preview"]);
+    expect(calls.map((c) => c.tipo).sort()).toEqual(["operacional", "preview"]);
     const ast = ts.createSourceFile("inbound.ts", fonteInbound, ts.ScriptTarget.Latest, true);
-    const declarations = ast.statements.filter(ts.isFunctionDeclaration).filter(n => n.name?.text === "executarTurnoDoAgente");
+    const declarations = ast.statements
+      .filter(ts.isFunctionDeclaration)
+      .filter((n) => n.name?.text === "executarTurnoDoAgente");
     expect(declarations).toHaveLength(1);
-    expect(declarations[0]!.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false).toBe(false);
+    expect(
+      declarations[0]!.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false,
+    ).toBe(false);
   });
 
   function auxiliaresForaDoNucleo(texto: string) {
     const ast = ts.createSourceFile("inbound.ts", texto, ts.ScriptTarget.Latest, true);
     const encontrados: Array<{ nome: string; owner: string | undefined }> = [];
     const visit = (node: ts.Node) => {
-      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && ["classifyStage", "maybeCompact"].includes(node.expression.text)) {
+      if (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        ["classifyStage", "maybeCompact"].includes(node.expression.text)
+      ) {
         let parent: ts.Node | undefined = node.parent;
         while (parent && !ts.isFunctionDeclaration(parent)) parent = parent.parent;
-        encontrados.push({ nome: node.expression.text, owner: parent && ts.isFunctionDeclaration(parent) ? parent.name?.text : undefined });
+        encontrados.push({
+          nome: node.expression.text,
+          owner: parent && ts.isFunctionDeclaration(parent) ? parent.name?.text : undefined,
+        });
       }
       ts.forEachChild(node, visit);
     };
@@ -342,28 +403,40 @@ describe("o call site — AST separa prévia sem job do turno operacional escolt
   }
   it("todos os auxiliares de classificação e compaction ficam dentro do núcleo", () => {
     const calls = auxiliaresForaDoNucleo(fonteInbound);
-    expect(new Set(calls.map(c => c.nome))).toEqual(new Set(["classifyStage", "maybeCompact"]));
-    expect(calls.filter(c => c.owner !== "executarTurnoDoAgente")).toEqual([]);
+    expect(new Set(calls.map((c) => c.nome))).toEqual(new Set(["classifyStage", "maybeCompact"]));
+    expect(calls.filter((c) => c.owner !== "executarTurnoDoAgente")).toEqual([]);
   });
 
   it("controle negativo: retirar a escolta é acusado mesmo mantendo o número de chamadas", () => {
-    const sabotado = fonteInbound.replace(ESCOLTADO, "() => Promise.resolve(),\n  );\n  await executarTurnoDoAgente(deps, job, pool, ctx, input);\n  void (");
+    const sabotado = fonteInbound.replace(
+      ESCOLTADO,
+      "() => Promise.resolve(),\n  );\n  await executarTurnoDoAgente(deps, job, pool, ctx, input);\n  void (",
+    );
     expect(sabotado).not.toBe(fonteInbound);
     expect(chamadasDoNucleo(sabotado)).toHaveLength(2);
-    expect(chamadasDoNucleo(sabotado).filter(c => c.tipo === "sem_escolta")).toHaveLength(1);
+    expect(chamadasDoNucleo(sabotado).filter((c) => c.tipo === "sem_escolta")).toHaveLength(1);
   });
   it("controle negativo: um novo atalho é acusado sem remover a escolta legítima", () => {
     const sabotado = `${fonteInbound}\nasync function atalho() { await executarTurnoDoAgente(a, b, c, d, e); }`;
-    expect(chamadasDoNucleo(sabotado).map(c => c.tipo).sort()).toEqual(["operacional", "preview", "sem_escolta"]);
+    expect(
+      chamadasDoNucleo(sabotado)
+        .map((c) => c.tipo)
+        .sort(),
+    ).toEqual(["operacional", "preview", "sem_escolta"]);
   });
   it("controle negativo: prévia não pode transportar um job operacional", () => {
-    const sabotado = fonteInbound.replace(/(await executarTurnoDoAgente\(\s*deps,\s*)null,/, "$1job,");
+    const sabotado = fonteInbound.replace(
+      /(await executarTurnoDoAgente\(\s*deps,\s*)null,/,
+      "$1job,",
+    );
     expect(sabotado).not.toBe(fonteInbound);
-    expect(chamadasDoNucleo(sabotado).filter(c => c.tipo === "sem_escolta")).toHaveLength(1);
+    expect(chamadasDoNucleo(sabotado).filter((c) => c.tipo === "sem_escolta")).toHaveLength(1);
   });
   it("controle negativo: um auxiliar fora do núcleo é acusado", () => {
     const sabotado = `${fonteInbound}\nasync function atalho() { await classifyStage(x); }`;
-    expect(auxiliaresForaDoNucleo(sabotado).filter(c => c.owner !== "executarTurnoDoAgente")).toEqual([{ nome: "classifyStage", owner: "atalho" }]);
+    expect(
+      auxiliaresForaDoNucleo(sabotado).filter((c) => c.owner !== "executarTurnoDoAgente"),
+    ).toEqual([{ nome: "classifyStage", owner: "atalho" }]);
   });
 
   it("o erro de orçamento se declara terminal — é o que a fila lê", () => {
@@ -382,7 +455,9 @@ describe("a fila trata veto de negócio como veto, não como incidente", () => {
     "else { await failJob(pool, job.id, workerId, err, claimOfJob(job)?.acquired_at); }";
 
   it("erro terminal vai para cancelJob; o resto continua em failJob", () => {
-    expect(fonteWorker.length, "guarda de vacuidade: arquivo do worker vazio").toBeGreaterThan(1000);
+    expect(fonteWorker.length, "guarda de vacuidade: arquivo do worker vazio").toBeGreaterThan(
+      1000,
+    );
     expect(
       fonteWorker,
       "bloqueio por orçamento em failJob = 5 tentativas por conversa + 1 job_dead crítico sem dedup por job",
@@ -463,7 +538,9 @@ describe("o código morto de orçamento não volta", () => {
   });
 
   it("controle negativo: a varredura enxerga um leitor quando ele existe", () => {
-    const comLeitor = semComentarios('const x = row.is_throttled;\n// is_disabled num comentário\n');
+    const comLeitor = semComentarios(
+      "const x = row.is_throttled;\n// is_disabled num comentário\n",
+    );
     expect(comLeitor.includes("is_throttled")).toBe(true);
     expect(comLeitor.includes("is_disabled")).toBe(false);
   });
@@ -498,7 +575,9 @@ describe("os textos do orçamento nomeiam botões que existem", () => {
    * pegar a primeira ocorrência passou a capturar o tooltip em vez do rótulo.
    */
   function rotuloDoBotaoDeVolta(): string {
-    const bloco = fonteCabecalho.slice(fonteCabecalho.indexOf('data-testid="devolver-ao-automatico"'));
+    const bloco = fonteCabecalho.slice(
+      fonteCabecalho.indexOf('data-testid="devolver-ao-automatico"'),
+    );
     const fechamento = bloco.indexOf("</Button>");
     const corpoDoBotao = fechamento === -1 ? bloco : bloco.slice(0, fechamento);
     const ocorrencias = [...corpoDoBotao.matchAll(/t\("([^"]+)"\)/g)];
@@ -536,7 +615,9 @@ describe("os textos do orçamento nomeiam botões que existem", () => {
       't("Voltar para a IA")',
     );
     expect(renomeado).not.toBe(fonteCabecalho);
-    const blocoRenomeado = renomeado.slice(renomeado.indexOf('data-testid="devolver-ao-automatico"'));
+    const blocoRenomeado = renomeado.slice(
+      renomeado.indexOf('data-testid="devolver-ao-automatico"'),
+    );
     const fechamentoRenomeado = blocoRenomeado.indexOf("</Button>");
     const corpoRenomeado =
       fechamentoRenomeado === -1 ? blocoRenomeado : blocoRenomeado.slice(0, fechamentoRenomeado);

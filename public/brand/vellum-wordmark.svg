@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="286" height="68" viewBox="0 0 286 68" role="img" aria-label="Véllum AI">
+  <circle cx="34" cy="34" r="31" fill="#9E2B25"/>
+  <circle cx="34" cy="34" r="27" fill="none" stroke="#F5F0E6" stroke-width=".8" stroke-dasharray="1.3 1.8"/>
+  <path d="M23.7 21.6 34 49.4 44.3 21.6 39.7 21.6 34 38.1 28.3 21.6Z" fill="#F5F0E6"/>
+  <text x="79" y="45" font-family="Georgia,serif" font-size="37" fill="#0C1F33" letter-spacing="-1.2">Véllum<tspan font-family="Arial,sans-serif" font-size="17" letter-spacing="1.2" dx="9">AI</tspan></text>
+</svg>

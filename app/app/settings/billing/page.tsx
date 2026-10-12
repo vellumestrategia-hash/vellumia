@@ -5,6 +5,9 @@ import { ROLE_RANK } from "@/lib/auth/types";
 import { emailDeSuporte } from "@/lib/branding/saida";
 import { Card } from "@/components/ui/card";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { Planos } from "@/components/vellum/Planos";
+import { Financeiro } from "@/components/vellum/Financeiro";
+import { carregarPlanosPublicos } from "@/lib/vellum/plans-server";
 
 export const dynamic = "force-dynamic";
 
@@ -23,18 +26,19 @@ export default async function BillingPage() {
   }
   const suporte = emailDeSuporte();
   const idioma = user.idioma;
+  const planos = await carregarPlanosPublicos();
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Billing</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Plano e faturamento</h1>
         <p className="text-sm text-muted-foreground">
           {traduzir("Planos, faturas e cobrança.", idioma)}
         </p>
       </header>
-      <Card className="max-w-xl p-6">
-        <h2 className="text-sm font-semibold">{traduzir("Em breve — Fase 2", idioma)}</h2>
+      <Financeiro orgId={activeOrg.orgId} suporteTemporario={Boolean(user.support)} />
+      <Card className="max-w-3xl p-6">
+        <h2 className="text-sm font-semibold">Suporte financeiro</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {traduzir("Billing entra na Fase 2 do roadmap.", idioma)}{" "}
           {suporte ? (
             <>
               {traduzir("Para questões de pagamento, contate", idioma)}{" "}
@@ -44,10 +48,20 @@ export default async function BillingPage() {
               .
             </>
           ) : (
-            <>{traduzir("Para questões de pagamento, fale com quem administra este sistema.", idioma)}</>
+            <>
+              {traduzir(
+                "Para questões de pagamento, fale com quem administra este sistema.",
+                idioma,
+              )}
+            </>
           )}
         </p>
       </Card>
+      <section className="vellum-site vellum-billing" aria-label="Catálogo de planos Véllum AI">
+        <p className="vellum-eyebrow">CATÁLOGO COMERCIAL</p>
+        <h2>Um plano para o ritmo da sua empresa.</h2>
+        <Planos mostrarCadastro={false} planos={planos} />
+      </section>
     </div>
   );
 }

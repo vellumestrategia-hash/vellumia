@@ -65,10 +65,11 @@ const schema = z.object({
   // Node
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-  // Supabase — obrigatórias sempre (até pra dev local)
+  // Desenvolvimento público parcial pode subir sem service_role;
+  // operações privilegiadas falham no admin client. Produção exige a chave.
   NEXT_PUBLIC_SUPABASE_URL: requiredAlways("NEXT_PUBLIC_SUPABASE_URL").url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: requiredAlways("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-  SUPABASE_SERVICE_ROLE_KEY: requiredAlways("SUPABASE_SERVICE_ROLE_KEY"),
+  SUPABASE_SERVICE_ROLE_KEY: required("SUPABASE_SERVICE_ROLE_KEY"),
 
   // Cron / interno
   INTERNAL_SECRET: required("INTERNAL_SECRET"),

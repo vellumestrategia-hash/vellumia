@@ -1,4 +1,6 @@
-# CLAUDE.md — DeskcommCRM
+# CLAUDE.md — Véllum AI (base DeskcommCRM)
+
+> Nesta distribuição, o contexto está no início de AGENTS.md e em docs/vellum/CONTINUIDADE.md. O usuário autorizou produto Véllum AI SaaS e publicação em vellumestrategia-hash/vellumia; os repositórios de origem permanecem preservados. Registrar o estado no Git e executar verificações pesadas no GitHub Actions. A monetização e identidade próprias substituem as premissas originais; a doutrina de segurança e preservação dos módulos permanece aplicável. Não executar fluxo upstream de release/update nesta distribuição.
 
 > Instruções pra futuras sessões Claude trabalhando neste repo. Leitura obrigatória antes de qualquer task de código.
 

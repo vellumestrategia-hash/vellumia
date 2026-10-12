@@ -24,6 +24,10 @@ let _admin: SupabaseClient | null = null;
 export function createAdminClient(): SupabaseClient {
   if (_admin) return _admin;
 
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Configure SUPABASE_SERVICE_ROLE_KEY no servidor para acessar operações administrativas.");
+  }
+
   _admin = createSupabaseClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: {
       autoRefreshToken: false,

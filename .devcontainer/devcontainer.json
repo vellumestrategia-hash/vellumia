@@ -1,0 +1,20 @@
+{
+  "name": "Véllum AI",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "remoteUser": "node",
+  "forwardPorts": [3010],
+  "portsAttributes": {
+    "3010": {
+      "label": "Véllum AI",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "npx --yes pnpm@9.15.9 install --frozen-lockfile"
+}

@@ -21,6 +21,7 @@ import type pg from 'pg';
 import { z } from 'zod';
 
 import { scrubMessage } from '@/lib/sentry/scrub';
+import { assertBillingAccess } from '@/lib/vellum/billing-access';
 
 import type { Logger } from '../../obs/logger';
 import { decidirParaOSeam } from './binding-do-ponto';
@@ -309,6 +310,7 @@ async function aplicarOrcamento(d: {
 }
 
 export async function runModelCall(db: pg.Pool, cfg: LlmEdgeConfig, input: RunModelCallInput, deps: RunModelCallDeps = {}) {
+  await assertBillingAccess(db, input.tenantId);
   const registry = deps.registry ?? createDefaultRegistry();
   const purpose = input.purpose ?? 'agent_turn';
 

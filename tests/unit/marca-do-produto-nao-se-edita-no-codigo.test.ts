@@ -1,4 +1,9 @@
 /**
+ * Distribuição Véllum AI: o usuário autorizou produto próprio e publicação
+ * em vellumestrategia-hash/vellumia, preservando a origem. O pino acompanha essa decisão;
+ * a resolução de marcas por instalação e empresa permanece configurável.
+ * O contexto abaixo documenta o motivo original do guard na base importada.
+ *
  * A marca padrão do produto é UM valor, e ele não se troca editando código.
  *
  * POR QUE ESTE ARQUIVO EXISTE — medido no PR #465 (2026-09-01). Um contribuidor
@@ -54,7 +59,7 @@ import { DEFAULT_APP_NAME, resolveBranding } from "@/lib/branding";
  * importado de `lib/branding`, de propósito: um teste que compara a constante
  * com ela mesma passa sempre.
  */
-const MARCA_DO_PRODUTO = "DeskcommCRM";
+const MARCA_DO_PRODUTO = "Véllum AI";
 
 const COMO_PERSONALIZAR =
   "Para personalizar a marca da SUA instalação, não edite esta constante: " +
@@ -64,7 +69,7 @@ const COMO_PERSONALIZAR =
   "e some com a sua marca no próximo `git pull`.";
 
 describe("a marca padrão do produto", () => {
-  it("é DeskcommCRM — e trocá-la aqui é mudar o produto, não a sua instalação", () => {
+  it("é Véllum AI — a identidade padrão desta distribuição", () => {
     expect(DEFAULT_APP_NAME, COMO_PERSONALIZAR).toBe(MARCA_DO_PRODUTO);
   });
 
@@ -76,7 +81,7 @@ describe("a marca padrão do produto", () => {
     expect(resolveBranding(undefined, undefined), COMO_PERSONALIZAR).toEqual({
       name: MARCA_DO_PRODUTO,
       logoUrl: null,
-      initial: "D",
+      initial: "V",
     });
   });
 });

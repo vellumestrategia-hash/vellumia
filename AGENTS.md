@@ -1,4 +1,18 @@
-# AGENTS.md — DeskcommCRM
+# AGENTS.md — Véllum AI (base DeskcommCRM)
+
+## Contexto da distribuição Véllum AI
+
+O usuário autorizou transformar este clone em Véllum AI por assinatura. Depois autorizou transferir todo o projeto para https://github.com/vellumestrategia-hash/vellumia e continuar trabalhando nesse repositório. Esse é o único remoto de escrita permitido. Commit e push das alterações necessárias estão autorizados; não alterar airshell/WhatsappCRM nem melgarafael/DeskcommCRM. LICENSE MIT permanece obrigatória. Não executar atualizador, release ou imagens upstream na distribuição Véllum.
+
+Leia primeiro `docs/vellum/CONTINUIDADE.md` e atualize-o ao concluir uma etapa. Código e estado de desenvolvimento devem ficar versionados para permitir retomada sem depender da memória do chat. Build, suíte completa e banco descartável devem rodar no GitHub Actions; evitar repetir build pesado neste computador de 6 GB. A autenticação com escrita no GitHub é necessária para publicar; preparação local não comprova envio nem aprovação dos checks.
+
+`docs/vellum/PLANO-TECNICO.md`, `docs/vellum/EXECUCAO-LOCAL.md` e `docs/vellum/RELATORIO.md` registram a adaptação e o estado comprovado. Marca padrão Véllum AI é deliberada nesta distribuição. A identidade vem de ../Véllum/relancamento; preservar aquela pasta. A monetização SaaS substitui a premissa self-host do texto original abaixo. Módulos existentes e seus guards, RLS e testes continuam valendo.
+
+Sem chave privada, só a prévia pública de desenvolvimento funciona; não inventar credenciais, métricas, assinaturas ou pagamentos. Produção continua exigindo service_role e demais serviços. Docker ausente e schema remoto ainda não aplicado não constituem teste verde de RLS.
+
+---
+
+O contrato técnico original é preservado abaixo como referência da base importada.
 
 > Contrato para **qualquer** agente de código (Codex, Cursor, Copilot, Amp, Claude Code).
 > Este arquivo é o núcleo portável. A **doutrina completa e não-negociável vive em

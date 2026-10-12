@@ -36,6 +36,11 @@ on:
     branches: [main]
   push:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
 
 # O GITHUB_TOKEN deste job serve a `actions/checkout` (clone) e a
 # `actions/setup-node` (manifest de `actions/node-versions`, repo público).
@@ -272,6 +277,8 @@ jobs:
     # 8-9 min é pago por parte, então três partes custam ~9 min de runner a mais
     # e devolvem ~9 min de relógio a cada uma.
     env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      VELLUM_BILLING_ENFORCEMENT: "false"
       # Provider controlado; preview/assistência executam core, ferramentas e gates reais.
       INTERNAL_AGENT_RUN_STUB: "true"
       SPECS_PARTE_1: >-

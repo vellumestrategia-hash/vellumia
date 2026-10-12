@@ -1,6 +1,7 @@
 import { marcaDaSaida } from "@/lib/branding/saida";
 import { createClient } from "@/lib/supabase/server";
 import { IdiomaProvider } from "@/lib/i18n/IdiomaProvider";
+import Link from "next/link";
 
 /**
  * A casca das telas de acesso — login, cadastro, recuperação, MFA.
@@ -44,11 +45,40 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <IdiomaProvider locale={locale}>
-      <div className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="w-full max-w-sm space-y-6">
-          {marca.logoUrl && (
-            <div className="flex justify-center">
-              {/*
+      <div className="vellum-auth">
+        <aside className="vellum-auth-story">
+          <Link href="/" className="vellum-brand" aria-label={`${marca.nome} — início`}>
+            {marca.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={marca.logoUrl} alt={marca.nome} className="vellum-auth-story-logo" />
+            ) : (
+              <span>{marca.nome}</span>
+            )}
+          </Link>
+          <div>
+            <p className="vellum-eyebrow">CADA CONVERSA TEM UM PRÓXIMO PASSO.</p>
+            <h2>
+              Seu atendimento.
+              <br />
+              Seu conhecimento.
+              <br />
+              <em>Sua operação.</em>
+            </h2>
+            <p>
+              Entre para acompanhar seus agentes, suas conversas e as oportunidades do seu time.
+              Tudo com o contexto que sua empresa construiu.
+            </p>
+          </div>
+          <small>{marca.nome} · Por escrito.</small>
+        </aside>
+        <section className="vellum-auth-access" aria-label="Acesso à plataforma">
+          <Link href="/" className="vellum-auth-back">
+            ← Voltar ao site
+          </Link>
+          <div className="vellum-auth-form space-y-6">
+            {marca.logoUrl && (
+              <div className="vellum-auth-mobile-brand justify-center">
+                {/*
                 <img> em vez de next/image pelo mesmo motivo da barra lateral: a URL
                 é de quem hospeda e o `next/image` exige allowlist de domínios
                 fechada em BUILD — a imagem pré-buildada do self-host recusaria o
@@ -64,17 +94,22 @@ export default async function PublicLayout({ children }: { children: React.React
                 "primeira <img> da página", e uma asserção de negação com seletor
                 largo passa sozinha assim que outra imagem entra na tela.
               */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                data-testid="logo-da-fachada"
-                src={marca.logoUrl}
-                alt={marca.nome}
-                className="h-10 w-auto max-w-[12rem] object-contain"
-              />
-            </div>
-          )}
-          {children}
-        </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  data-testid="logo-da-fachada"
+                  src={marca.logoUrl}
+                  alt={marca.nome}
+                  className="h-10 w-auto max-w-[12rem] object-contain"
+                />
+              </div>
+            )}
+            {children}
+          </div>
+          <p className="vellum-auth-bottom">
+            <Link href="/legal/privacy">Privacidade</Link> ·{" "}
+            <Link href="/legal/terms">Termos de uso</Link>
+          </p>
+        </section>
       </div>
     </IdiomaProvider>
   );

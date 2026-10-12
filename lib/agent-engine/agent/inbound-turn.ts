@@ -60,6 +60,7 @@ import {
 } from '../edge/llm/run-model-call';
 import type { ProviderRegistry } from '../edge/llm/providers';
 import { HANDOFF_REASON_ORCAMENTO } from '../edge/llm/orcamento';
+import { BillingAccessDeniedError } from '@/lib/vellum/billing-access';
 import { MIRROR_WARN_ONLY, mirrorLeadStageToCrm } from '../edge/crm/move-lead-stage';
 import { insertInboxItem } from '../db/repository';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -632,7 +633,7 @@ export async function comHandoffSeOrcamentoAcabar<T>(
   try {
     return await chamada();
   } catch (err) {
-    if (!(err instanceof LlmBudgetExceededError)) throw err;
+    if (!(err instanceof LlmBudgetExceededError) && !(err instanceof BillingAccessDeniedError)) throw err;
     const resumo = await ctx.resumoDoCheckpoint();
     // AVISA antes de silenciar — ver a nota de ORDEM no gatilho determinístico:
     // `performHumanHandoff` arma a trava que o gate de envio lê, então a única
@@ -659,8 +660,8 @@ export async function comHandoffSeOrcamentoAcabar<T>(
       { tenantId: ctx.tenantId, leadId: ctx.leadId, conversationId: ctx.conversationId },
       {
         reason: HANDOFF_REASON_ORCAMENTO,
-        conversationSummary: `${RESUMO_DO_HANDOFF_POR_ORCAMENTO}\n\n${resumo}`,
-        inboxTitle: TITULO_DO_HANDOFF_POR_ORCAMENTO,
+        conversationSummary: `${err instanceof BillingAccessDeniedError ? err.message : RESUMO_DO_HANDOFF_POR_ORCAMENTO}\n\n${resumo}`,
+        inboxTitle: err instanceof BillingAccessDeniedError ? 'Atendimento humano necessário: assinatura ou limite de IA' : TITULO_DO_HANDOFF_POR_ORCAMENTO,
         avisoAoLead: aviso,
         log: ctx.log,
       },
