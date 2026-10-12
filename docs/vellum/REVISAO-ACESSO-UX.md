@@ -4,6 +4,21 @@ Revisão de 12/10/2026, solicitada pelo proprietário após uma conta de empresa
 ficar parada na tela Perfil. Este documento trata a Véllum cadastrada nessa
 conta como empresa de teste, separada da administração da plataforma.
 
+## Contas e destinos
+
+O mesmo formulário de login atende aos dois públicos. O nome da empresa não
+concede privilégios de plataforma; os papéis vêm da sessão e do banco.
+
+| Conta | Primeiro acesso |
+| --- | --- |
+| Cliente sem empresa vinculada | Configurar sua empresa |
+| Cliente com empresa | Configuração inicial pendente ou CRM, conforme seu acesso |
+| Administrador da Véllum sem empresa cliente | Administração da plataforma |
+
+Cadastrar Véllum como empresa de teste continua sendo uma conta de cliente.
+Administrador de uma empresa administra seu próprio espaço; administrador da
+plataforma tem o papel separado. As correções conservam essa distinção.
+
 ## Bloqueio reproduzido e causa
 
 Na sessão real do Chrome, `/app/settings/profile` mostrava o perfil com a
@@ -78,6 +93,30 @@ rotas não deve ser tratada como confirmação do carregamento final do CRM.
 Os dois casos novos de tradução de sessão foram reproduzidos como falha antes
 da correção e aprovados depois. Confirmar os checks da revisão final.
 
+### Aprovação da revisão final
+
+Código `ee6e6f76fad756fac32ba79fcd46a5662da1550c`, em 12/10/2026:
+
+| Verificação | Resultado | Execução |
+| --- | --- | --- |
+| TypeScript, lint e unitários | Aprovados; 8.026 casos, um caso de falha esperada existente | [CI](https://github.com/vellumestrategia-hash/vellumia/actions/runs/38282582626) |
+| Invariantes de banco e isolamento | Aprovados; 1.481 casos, um de falha esperada e um ignorado | Mesmo CI |
+| Build e interface pública | Aprovados; Axe, navegação e ausência de overflow/erros nas resoluções verificadas | [Build e público](https://github.com/vellumestrategia-hash/vellumia/actions/runs/38282582421) |
+| Navegação com Supabase descartável | As três partes aprovadas: 143 + 95 + 55 = 293 casos; oito ignorados | [E2E](https://github.com/vellumestrategia-hash/vellumia/actions/runs/38282582578) |
+
+Essa execução substitui as pendências dos checks anteriores nesta revisão.
+O percurso de publicação de follow-up passou com a posição corrigida dos
+avisos. As capturas `02-crm.png` e `04-retorno-mobile.png` foram inspecionadas:
+o Inbox está carregado, mostra o estado vazio da empresa nova e, após sair e
+entrar novamente, não exibe o aviso antigo de autenticação. O perfil móvel
+mostra a confirmação de salvamento e o caminho de retorno ao início.
+
+Artifacts `vellum-acesso-<SHA>`, `vellum-admin-ui-<SHA>` e
+`vellum-publico-<SHA>` disponíveis nos runs acima, com retenção de sete dias.
+As cópias locais ficam em `C:/Users/Lenovo/.codex/tmp/VellumAI-UI/ci-ee6e6f76-acesso`,
+`ci-ee6e6f76-admin` e `ci-ee6e6f76-publico`, fora do Git. Os dados das provas
+remotas são fixtures; não são métricas ou contas comerciais reais.
+
 As provas de navegador incluem:
 
 | Percurso | Prova |
@@ -124,7 +163,14 @@ exige chave de API e domínio verificado.
 O [envio padrão do Supabase](https://supabase.com/docs/guides/auth/auth-smtp) é restrito aos endereços da
 equipe do projeto e não atende ao cadastro de clientes externos.
 
-Para configurar Resend, caso seja a opção escolhida: verificar um domínio de
+O proprietário escolheu Resend Free. Guia de configuração em [RESEND.md](RESEND.md).
+Não é necessário acesso a uma caixa de e-mail do domínio: falta autorizar o
+envio pelo DNS, obter a chave de envio e conectar o provedor ao Supabase.
+O login do Resend foi aberto para a configuração, ainda sem sessão autenticada.
+O proprietário confirmou possuir acesso ao painel do domínio. Foi solicitado
+que entre/crie a conta gratuita no Resend com Gmail e deixe o painel aberto.
+
+Para configurar Resend: verificar um domínio de
 envio com os registros DNS informados pelo provedor; criar chave restrita ao
 envio; configurar no Supabase `smtp.resend.com`, porta `465`, usuário `resend`,
 chave como senha, remetente no domínio verificado e nome Véllum AI. Desativar

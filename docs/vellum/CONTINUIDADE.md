@@ -61,6 +61,43 @@ Próximo passo desta etapa: concluir Actions do refinamento para o mesmo SHA. Pr
 
 ## Como retomar
 
+### Revisão de acesso aprovada — código ee6e6f76fad756fac32ba79fcd46a5662da1550c
+
+Em 12/10/2026, os checks desse código terminaram aprovados: CI 38282582626
+(TypeScript, lint, 8.026 unitários e 1.481 invariantes de banco/isolamento),
+build e interface pública 38282582421, E2E 38282582578 com as três partes
+(143 + 95 + 55 = 293 casos aprovados, oito ignorados). Os casos de falha esperada
+existentes nas suítes unitária e de invariantes continuam declarados; não são
+falhas novas. Esse resultado supera as pendências e reprovações anteriores
+da revisão de acesso descritas abaixo. Automações upstream de release/imagens
+continuam sem publicar, conforme o contrato desta distribuição.
+
+Inspeção das capturas finais confirmou Inbox carregado depois do cadastro e
+depois de sair/entrar, sem skeletons nem aviso antigo de sessão; perfil móvel
+com feedback persistente e retorno ao início. Publicação de follow-up também
+aprovou depois de mover os avisos para baixo. Artifacts `vellum-acesso-<SHA>`,
+`vellum-admin-ui-<SHA>` e `vellum-publico-<SHA>` nos runs correspondentes, retidos
+por sete dias. Cópias em C:/Users/Lenovo/.codex/tmp/VellumAI-UI/ci-ee6e6f76-acesso,
+ci-ee6e6f76-admin e ci-ee6e6f76-publico. Dados das provas são fixtures.
+Relatório e limites em REVISAO-ACESSO-UX.md. Nenhum SQL novo foi necessário.
+
+Pendência de acesso real: Resend Free escolhido pelo proprietário. Ele não tem
+acesso à caixa de e-mail do domínio, mas confirmou acesso ao painel DNS; isso
+é suficiente para verificar um remetente, sem contratar uma caixa de e-mail.
+Consulta pública retornou DNS da HostGator. Proposta ainda não aplicada:
+auth.vellumestrategia.com.br / acesso@auth.vellumestrategia.com.br.
+Guia completo em RESEND.md. Login do Resend aberto no Chrome, sem sessão;
+solicitado que o proprietário entre/crie a conta Free com Gmail e deixe o
+painel aberto. Depois cadastrar domínio, entregar registros reais ao painel
+DNS, obter chave de envio privada, configurar SMTP no Supabase pela API já
+autorizada, aplicar os templates e comprovar entrega/links reais. Não ativar
+upgrade nem afrouxar confirmação de e-mail. SMTP e templates ainda não foram
+alterados; Site URL/allowlist locais já foram corrigidos para localhost:3010.
+
+A aprovação do Mailpit/ambiente descartável não comprova entrega no Gmail.
+IA, Meta e Asaas reais continuam exigindo credenciais/homologação próprias.
+O envio posterior somente de documentação não altera o código validado acima.
+
 ### Revisão de acesso e primeira experiência — 12/10/2026
 
 Conta de usuário de empresa reproduziu Perfil com navegação vazia: sessão sem
