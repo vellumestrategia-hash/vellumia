@@ -23,3 +23,5 @@ Botões com seleção anunciada, navegação com aria-current, ícones decorativ
 ## Verificação
 
 Testes locais focados em comportamento e contratos de idioma; inspeção visual em desktop e celular pela interface real. Build, suíte completa, isolamento e E2E no Actions do repositório autorizado. Não executar build pesado nesta máquina. Registrar evidências e limites em CONTINUIDADE.md. Este refinamento não requer alteração SQL.
+
+Aceite concluído para c488914b: build, suíte unitária, isolamento e as três partes E2E aprovados. Validação pública com Axe em quatro larguras e prova de administrador sem empresa em desktop/celular/escuro aprovadas. A demonstração continua ilustrativa; indicadores autenticados vêm do banco. O resumo com runs e artifacts está em CONTINUIDADE.md.

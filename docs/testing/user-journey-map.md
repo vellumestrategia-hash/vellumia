@@ -1972,3 +1972,5 @@ Validação integral do mesmo produto: 733 arquivos unitários / 7.911 casos apr
 | Tema salvo | Hidratação conserva HTML do servidor e restaura preferência do navegador; teste de hidratação e inspeção real sem aviso |
 
 Capturas de fixtures da administração: artifact vellum-admin-ui-SHA do E2E; capturas públicas: artifact vellum-publico-SHA do perf. Conferir execução aprovada para o mesmo SHA antes de tratar as provas novas da nuvem como concluídas.
+
+Aceite comprovado em c488914b: CI 38216423478, build/público 38216423578 e E2E 38216423440 aprovados. E2E: 142 + 95 + 55 casos aprovados; a conta exclusiva de plataforma também concluiu a saída e a limpeza. Axe público retornou zero violações nas quatro larguras; sem overflow ou erros JavaScript. Capturas privadas da conta proprietária ficam fora do Git; o CI utiliza dados descartáveis.

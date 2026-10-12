@@ -61,4 +61,14 @@ Próximo passo desta etapa: concluir Actions do refinamento para o mesmo SHA. Pr
 
 ## Como retomar
 
+### Refinamento concluído — código c488914b7e1a13109d0db0d696f5d5556c61a2f4
+
+Em 12/10/2026, todos os checks do código acima foram aprovados: CI verify + invariants no run 38216423478; build de produção e validação pública no run 38216423578; E2E, incluindo as três partes e a conta exclusiva de plataforma, no run 38216423440. Os registros anteriores de checks pendentes/reprovados nesta etapa são histórico, superados por essa execução. As automações upstream de release/imagem continuam intencionalmente sem publicação.
+
+Landing, planos, login e cadastro foram verificados em 375/768/1024/1440px, com Axe, etapas da demonstração, menu móvel, Escape/foco, campos inválidos e ausência de overflow/erros de JavaScript. A administração foi verificada em 1280×900 e 375×812, tema escuro, Axe, navegação, saída e zero vínculos da conta descartável. A restrição granted_by foi respeitada na limpeza. Provas de empresas/convites/cache e de administrador comum permaneceram ativas.
+
+Evidências remotas nos artifacts vellum-publico-c488914b7e1a13109d0db0d696f5d5556c61a2f4 e vellum-admin-ui-c488914b7e1a13109d0db0d696f5d5556c61a2f4, com retenção de sete dias. Cópias locais em C:/Users/Lenovo/.codex/tmp/VellumAI-UI/ci-c488914b-publico e ci-c488914b-admin, fora do Git. Capturas da conta real proprietária em admin-desktop.jpg/admin-escuro.jpg/admin-mobile-escuro.jpg; nenhuma empresa de fixture foi criada no Supabase real.
+
+Próxima etapa funcional: configurar/homologar os provedores de IA, os canais e o Asaas sandbox, conforme FINANCEIRO.md. Este refinamento não exigiu SQL novo nem implantação. Atualização posterior somente de documentação não altera o código validado acima.
+
 Ler AGENTS.md e este arquivo, depois RELATORIO.md e FINANCEIRO.md. Conferir `git status`, último commit e resultados do Actions para o mesmo SHA. REQUISITOS.md preserva o briefing inicial; PLANO-TECNICO.md registra a auditoria. Ao fechar uma etapa, atualizar este arquivo com evidência, pendência e próximo passo, sem reproduzir segredos ou afirmar verificações não executadas.
