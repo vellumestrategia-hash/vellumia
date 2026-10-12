@@ -96,6 +96,15 @@ construtor de follow-up, com 94 testes aprovados e uma falha. Avisos movidos
 para o canto inferior para liberar as ações do cabeçalho; aguardar aprovação
 do novo SHA antes de declarar a revisão completa.
 
+Inspeção da captura de retorno de f511aa9c encontrou skeletons e aviso antigo
+de sessão, apesar do teste de URL aprovado. A jornada agora exige o estado
+vazio do Inbox depois da API carregar, inclusive após o novo login, sem aviso
+de sessão. Saída no cliente abre um documento novo após encerrar/auditar no
+servidor; formulários de servidor conservam o redirect. Códigos unauthenticated
+e unauthorized recebem a orientação canônica em português. Dois testes de
+mensagem falharam antes da correção e passaram depois; 27 casos locais em seis
+arquivos e lint dos arquivos novos aprovados. Os checks finais ainda são necessários.
+
 ### Refinamento concluído — código c488914b7e1a13109d0db0d696f5d5556c61a2f4
 
 Em 12/10/2026, todos os checks do código acima foram aprovados: CI verify + invariants no run 38216423478; build de produção e validação pública no run 38216423578; E2E, incluindo as três partes e a conta exclusiva de plataforma, no run 38216423440. Os registros anteriores de checks pendentes/reprovados nesta etapa são histórico, superados por essa execução. As automações upstream de release/imagem continuam intencionalmente sem publicação.

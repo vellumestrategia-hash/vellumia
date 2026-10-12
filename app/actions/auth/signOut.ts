@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { audit } from "@/lib/audit";
 
-export async function signOut(): Promise<void> {
+export async function signOutSession(): Promise<void> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,6 +26,10 @@ export async function signOut(): Promise<void> {
       userAgent: hdrs.get("user-agent") ?? null,
     });
   }
+}
 
+/** Formulários de servidor conservam o redirecionamento normal. */
+export async function signOut(): Promise<void> {
+  await signOutSession();
   redirect("/login");
 }

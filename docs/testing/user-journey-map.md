@@ -15,7 +15,9 @@ vínculo caía no Perfil com menu vazio. Reproduzido na sessão real e corrigido
 em `/app` e no layout compartilhado. `primeiro-acesso-sem-organizacao` cobre
 login, URL direta do perfil, configuração e saída; `signup-journey` cobre o
 percurso do cadastro ao CRM, perfil móvel, saída real e novo login. O helper
-de e-mail não reescreve links recebidos. Estado e limites das verificações em
+de e-mail não reescreve links recebidos. A jornada exige a lista do Inbox carregada
+antes da captura, inclusive após sair e entrar de novo; mudar só a URL não basta.
+Estado e limites das verificações em
 `docs/vellum/REVISAO-ACESSO-UX.md` e `docs/vellum/CONTINUIDADE.md`.
 
 - `[P0]` primeira impressão — bug aqui é vergonha pública; prioridade máxima.

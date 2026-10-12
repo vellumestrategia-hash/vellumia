@@ -73,6 +73,7 @@ test("criar conta: confirmação → configuração → CRM → perfil → sair 
   await page.getByRole("button", { name: "Começar a usar", exact: true }).click();
   await page.waitForURL("**/app/inbox");
   await expect(page.getByRole("navigation", { name: "Navegação principal" }).getByRole("link").first()).toBeVisible();
+  await expect(page.getByText("Sem conversas por aqui", { exact: true })).toBeVisible();
   await page.screenshot({ path: `${evidence}/02-crm.png`, fullPage: true });
 
   // Perfil tem entrada no menu da conta, feedback ao salvar e caminho de volta.
@@ -93,9 +94,15 @@ test("criar conta: confirmação → configuração → CRM → perfil → sair 
   await page.getByRole("button", { name: "Menu do usuário", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await page.waitForURL("**/login");
+  await expect(page.getByRole("heading", { name: "Entrar", exact: true })).toBeVisible();
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Senha").fill(password);
   await page.getByRole("button", { name: "Entrar" }).click();
   await page.waitForURL("**/app/inbox", { timeout: 30_000 });
+  // Mudar a URL não comprova que a API autenticada carregou. A primeira prova
+  // capturou skeletons e um erro antigo de sessão depois do novo login.
+  await expect(page.getByText("Sem conversas por aqui", { exact: true })).toBeVisible();
+  await expect(page.getByText("Authentication required", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Sessão expirada. Faça login novamente.", { exact: true })).toHaveCount(0);
   await page.screenshot({ path: `${evidence}/04-retorno-mobile.png`, fullPage: true });
 });

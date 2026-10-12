@@ -41,6 +41,14 @@ const COPY: Record<string, { variant: Variant; msg?: string }> = {
     variant: "warning",
     msg: "Sessão expirada. Faça login novamente.",
   },
+  unauthenticated: {
+    variant: "warning",
+    msg: "Sessão expirada. Faça login novamente.",
+  },
+  unauthorized: {
+    variant: "warning",
+    msg: "Sessão expirada. Faça login novamente.",
+  },
   forbidden_role: {
     variant: "warning",
     msg: "Você não tem permissão para esta ação.",

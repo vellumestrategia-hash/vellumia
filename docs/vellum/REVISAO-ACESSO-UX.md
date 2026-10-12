@@ -43,6 +43,10 @@ escolhas seguintes da conta real permanecem com a pessoa.
   de salvar/validar sobre o botão Publicar do construtor de follow-up; o cursor
   mantinha o aviso aberto e impedia clicar na ação. A posição foi corrigida
   no produto, conservando o fechamento manual, a duração e as mensagens.
+- Sair encerra a sessão no servidor, registra auditoria e abre um documento
+  novo de login. O estado e os avisos de requests da página anterior deixam
+  de sobreviver à navegação parcial. Recusas de sessão da borda e do cliente
+  HTTP agora recebem a mesma orientação em português que o código canônico.
 
 ## Verificação e evidência
 
@@ -51,18 +55,28 @@ cliente sem empresa recebeu Perfil, e administrador sem empresa recebeu Inbox.
 Depois da correção, os casos passam e mantêm o destino de clientes com empresa
 e de quem usa uma interface personalizada por vínculo.
 
-Validação local: 18 casos em quatro arquivos aprovados, incluindo perfil com
-URL inválida, discriminação da recusa do link e cobertura de tradução espanhola.
+Validação local: 27 casos em seis arquivos aprovados, incluindo perfil com
+URL inválida, discriminação da recusa do link, cobertura de tradução espanhola,
+orientação dos códigos de sessão e encerramento/auditoria/redirecionamento de saída.
 Build, suíte completa, isolamento e navegação com banco descartável são do
 GitHub Actions, para preservar os recursos do computador local. A aprovação do
 SHA deve ser registrada em CONTINUIDADE.md depois da execução.
 
 O SHA `f511aa9c` aprovou TypeScript, lint, 8.022 testes unitários (um caso de
 falha esperada existente na suíte), invariantes e build/validação pública.
-A partes 1 e 3 do E2E também aprovaram, incluindo a jornada completa de cadastro,
+As partes 1 e 3 do E2E também aprovaram, incluindo a jornada de cadastro,
 perfil móvel com Axe, saída real e novo login. A parte 2 identificou a sobreposição dos
 avisos na publicação; suas 94 aprovações não tornam a execução verde.
 A correção da posição dos avisos requer os checks do próximo SHA.
+
+A inspeção visual da captura de retorno desse SHA encontrou skeletons e um
+aviso antigo "Authentication required". O teste esperava a URL, mas não a lista
+carregada. O teste foi reforçado para exigir o estado vazio real da empresa nova,
+inclusive após o novo login, e ausência de avisos de sessão nesse retorno.
+A saída foi ajustada para encerrar o documento anterior. A prova anterior de
+rotas não deve ser tratada como confirmação do carregamento final do CRM.
+Os dois casos novos de tradução de sessão foram reproduzidos como falha antes
+da correção e aprovados depois. Confirmar os checks da revisão final.
 
 As provas de navegador incluem:
 

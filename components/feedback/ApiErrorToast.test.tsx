@@ -58,6 +58,15 @@ describe("ApiErrorToast", () => {
     );
   });
 
+  it.each(["unauthenticated", "unauthorized"])("orienta a pessoa quando a API recusa a sessão: %s", (code) => {
+    showApiError(new ApiError(401, code, undefined, "req-auth", "Authentication required"));
+    expect(toast.warning).toHaveBeenCalledWith(
+      "Sessão expirada. Faça login novamente.",
+      expect.objectContaining({ description: "ID: req-auth" }),
+    );
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
   it("calls toast.warning com mensagem humana para invalid_state (casos humanos, spec 15)", () => {
     showApiError(new ApiError(409, "invalid_state", undefined, "req-3"));
     expect(toast.warning).toHaveBeenCalledTimes(1);

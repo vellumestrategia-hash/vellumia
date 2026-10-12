@@ -78,8 +78,12 @@ export function AuthProvider({
       refreshing,
       signOut: async () => {
         resetRealtimeAuthentication();
-        const { signOut } = await import("@/app/actions/auth/signOut");
-        await signOut();
+        const { signOutSession } = await import("@/app/actions/auth/signOut");
+        await signOutSession();
+        // Uma saída precisa encerrar também o estado do documento anterior.
+        // Navegação parcial conservava o Toaster global, deixando erros de
+        // requests antigas aparecerem depois de um novo login.
+        window.location.replace("/login");
       },
     }),
     [user, activeOrg, refreshing],
