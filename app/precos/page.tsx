@@ -54,7 +54,7 @@ export default async function PrecosPage() {
             <summary>Qual conexão de WhatsApp é utilizada?</summary>
             <p>
               A conexão oficial é a WhatsApp Business Platform da Meta, com suas regras de
-              consentimento, templates e janela de atendimento. A plataforma também preserva a
+              consentimento, templates e janela de atendimento. A plataforma também preserva
               uma integração alternativa não oficial, com diferenças de suporte,
               estabilidade e risco de bloqueio.
             </p>
