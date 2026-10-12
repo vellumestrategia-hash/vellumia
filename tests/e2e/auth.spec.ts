@@ -14,8 +14,9 @@ test.describe("auth flow", () => {
     await page.locator("#email").fill("nobody@example.com");
     await page.locator("#password").fill("wrong-password-xyz");
     await page.getByRole("button", { name: /entrar/i }).click();
-    // Wait for either an inline error or that we did NOT navigate to /app
-    await page.waitForTimeout(1500);
+    // Não navegar também acontecia enquanto a requisição ainda não terminou.
+    // O usuário precisa receber uma explicação concreta, não só continuar aqui.
+    await expect(page.getByRole("alert").filter({ hasText: "Email ou senha incorretos." })).toBeVisible();
     expect(page.url()).not.toMatch(/\/app\//);
   });
 
