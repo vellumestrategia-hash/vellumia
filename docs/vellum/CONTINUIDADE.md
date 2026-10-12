@@ -94,6 +94,14 @@ autorizada, aplicar os templates e comprovar entrega/links reais. Não ativar
 upgrade nem afrouxar confirmação de e-mail. SMTP e templates ainda não foram
 alterados; Site URL/allowlist locais já foram corrigidos para localhost:3010.
 
+Atualização dessa pendência: o proprietário forneceu chave Resend de envio.
+GET /domains recebeu 401 restricted_api_key, com restrição explícita a envio;
+não se trata de chave inválida. Chave mantida apenas em memória privada, sem
+arquivo ou Git. Domínio/SMTP não alterados. Painel no Chrome permanece no
+login; solicitado que ele abra https://resend.com/domains na mesma conta e
+deixe a sessão autenticada. Cadastrar pelo painel evita ampliar a chave.
+Depois continuar com registros DNS reais, verificação e conexão SMTP.
+
 A aprovação do Mailpit/ambiente descartável não comprova entrega no Gmail.
 IA, Meta e Asaas reais continuam exigindo credenciais/homologação próprias.
 O envio posterior somente de documentação não altera o código validado acima.

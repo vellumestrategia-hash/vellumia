@@ -169,6 +169,11 @@ envio pelo DNS, obter a chave de envio e conectar o provedor ao Supabase.
 O login do Resend foi aberto para a configuração, ainda sem sessão autenticada.
 O proprietário confirmou possuir acesso ao painel do domínio. Foi solicitado
 que entre/crie a conta gratuita no Resend com Gmail e deixe o painel aberto.
+Em seguida forneceu chave de envio. A consulta de domínios retornou HTTP 401
+`restricted_api_key`, explicitando que a chave só envia e-mails. Não ampliar
+o acesso: cadastrar o domínio pelo painel autenticado. O Chrome permanece no
+login; solicitado acesso a Domains na conta correspondente. A chave não foi
+gravada no Git ou em arquivo. Nenhum domínio ou SMTP foi alterado nessa consulta.
 
 Para configurar Resend: verificar um domínio de
 envio com os registros DNS informados pelo provedor; criar chave restrita ao

@@ -1,11 +1,16 @@
 # E-mails de acesso da Véllum AI — Resend Free
 
 Estado em 12/10/2026: opção gratuita escolhida pelo proprietário. A conexão
-SMTP ainda não foi aplicada; faltam conta/chave do Resend e verificação do
-domínio. O Supabase mantém a confirmação de e-mail obrigatória.
+SMTP ainda não foi aplicada; falta cadastrar e verificar o domínio de envio.
+O Supabase mantém a confirmação de e-mail obrigatória.
 
-O proprietário confirmou acesso ao painel do domínio. O login do Resend está
-aberto no Chrome, aguardando que ele entre ou crie sua conta gratuita com Gmail.
+O proprietário confirmou acesso ao painel do domínio e forneceu uma chave
+restrita a envio. A consulta de domínios recebeu HTTP 401 `restricted_api_key`
+com a mensagem de restrição a envio; isso não significa chave inválida.
+Ela foi mantida somente em memória privada, sem arquivo ou commit.
+O painel do Resend no Chrome ainda mostra login. Foi solicitado que o
+proprietário abra Domains na mesma conta dessa chave e deixe o painel
+autenticado, para cadastrar o domínio sem ampliar as permissões da chave.
 
 ## O que é necessário
 
