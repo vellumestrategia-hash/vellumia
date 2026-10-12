@@ -79,6 +79,23 @@ jornada de cadastro ao CRM, perfil/saída/retorno; links reais de e-mail não s�
 reescritos pelo helper. Checks completos do novo SHA aguardam Actions. A prova
 descartável não valida entrega no Gmail, WhatsApp/IA reais ou cobrança.
 
+Token de gerenciamento fornecido depois permitiu acessar o Supabase real.
+Site URL corrigido de localhost:3000 para localhost:3010 e allowlist dessa
+origem local registrada; leitura posterior confirmou. A API recusou os modelos
+de e-mail com HTTP 400 porque o projeto Free usa o remetente padrão, sem SMTP
+próprio. Confirmação continua obrigatória e os modelos permanecem padrão.
+Falta configurar um provedor SMTP (pode ter plano gratuito), aplicar os modelos
+da Véllum e validar a entrega real. Token não gravado nem versionado. Não é
+necessário acesso ao painel proprietário para essa configuração pela API.
+
+CI verify + invariants (38278594958) e build/validação pública (38278594897)
+aprovaram f511aa9c; 8.022 unitários aprovados e um caso esperado existente.
+As partes 1 e 3 do E2E passaram, incluindo cadastro ao CRM e perfil móvel.
+Parte 2 acusou toast sobre o botão Publicar no
+construtor de follow-up, com 94 testes aprovados e uma falha. Avisos movidos
+para o canto inferior para liberar as ações do cabeçalho; aguardar aprovação
+do novo SHA antes de declarar a revisão completa.
+
 ### Refinamento concluído — código c488914b7e1a13109d0db0d696f5d5556c61a2f4
 
 Em 12/10/2026, todos os checks do código acima foram aprovados: CI verify + invariants no run 38216423478; build de produção e validação pública no run 38216423578; E2E, incluindo as três partes e a conta exclusiva de plataforma, no run 38216423440. Os registros anteriores de checks pendentes/reprovados nesta etapa são histórico, superados por essa execução. As automações upstream de release/imagem continuam intencionalmente sem publicação.

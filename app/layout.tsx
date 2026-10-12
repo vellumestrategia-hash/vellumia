@@ -301,7 +301,7 @@ export default function RootLayout({
             <ThemeProvider>{children}</ThemeProvider>
           </MarcaDosClientComponents>
           <Toaster
-            position="top-right"
+            position="bottom-right"
             richColors
             closeButton
             duration={4000}
