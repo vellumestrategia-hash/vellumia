@@ -61,6 +61,9 @@ test("admin de plataforma sem empresa navega no desktop e celular com foco e sa�
     expect(memberships.error).toBeNull();
     expect(memberships.data).toEqual([]);
   } finally {
+    // granted_by tem ON DELETE RESTRICT; remover a própria concessão antes de Auth.
+    const grantRemoved = await db.from("platform_admins").delete().eq("user_id", userId);
+    if (grantRemoved.error) throw grantRemoved.error;
     const removed = await db.auth.admin.deleteUser(userId);
     if (removed.error) throw removed.error;
   }
@@ -237,6 +240,10 @@ test("org única oferece criação, responsável aceita e A→B→A não mistura
   } finally {
     await guestContext?.close();
     for (const org of orgs) await db.from("organizations").delete().eq("id", org);
+    if (users[0]) {
+      const grantRemoved = await db.from("platform_admins").delete().eq("user_id", users[0]);
+      if (grantRemoved.error) throw grantRemoved.error;
+    }
     for (const user of users) await db.auth.admin.deleteUser(user);
   }
 });

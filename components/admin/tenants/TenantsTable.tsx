@@ -21,10 +21,7 @@ import { useT } from "@/hooks/i18n/useT";
 // Status badge
 // ---------------------------------------------------------------------------
 
-const STATUS_VARIANTS: Record<
-  string,
-  "success" | "info" | "warning" | "error" | "neutral"
-> = {
+const STATUS_VARIANTS: Record<string, "success" | "info" | "warning" | "error" | "neutral"> = {
   active: "success",
   onboarding: "info",
   suspended: "warning",
@@ -33,18 +30,12 @@ const STATUS_VARIANTS: Record<
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Ativo",
-  onboarding: "Onboarding",
+  onboarding: "Em configuração",
   suspended: "Suspenso",
   redacted: "Redigido",
 };
 
-function StatusBadge({
-  status,
-  onboardedAt,
-}: {
-  status: string;
-  onboardedAt: string | null;
-}) {
+function StatusBadge({ status, onboardedAt }: { status: string; onboardedAt: string | null }) {
   const t = useT();
   // 'onboarding' não existe no banco — é derivado: ativo sem onboarding concluído.
   const effective = status === "active" && !onboardedAt ? "onboarding" : status;
@@ -68,9 +59,7 @@ function formatDate(iso: string | null, idioma: string): string {
   }).format(new Date(iso));
 }
 
-function extractCount(
-  arr: Array<{ count: number }> | null | undefined,
-): number {
+function extractCount(arr: Array<{ count: number }> | null | undefined): number {
   if (!arr || arr.length === 0) return 0;
   return arr[0]?.count ?? 0;
 }
@@ -90,15 +79,22 @@ function shortCnpj(cnpj: string | null): string {
 export function TenantsTableSkeleton() {
   const t = useT();
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border" role="status" aria-label={t("Carregando empresas")}>
       <Table>
         <TableHeader>
           <TableRow>
-            {["Slug", t("Nome"), "CNPJ", t("Status"), t("Users"), t("Conversas"), t("Criado em"), ""].map(
-              (h) => (
-                <TableHead key={h}>{h}</TableHead>
-              ),
-            )}
+            {[
+              "Slug",
+              t("Nome"),
+              "CNPJ",
+              t("Status"),
+              t("Usuários"),
+              t("Conversas"),
+              t("Criado em"),
+              "",
+            ].map((h) => (
+              <TableHead key={h}>{h}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -140,9 +136,9 @@ export function TenantsTable({
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-md border py-16 text-center text-muted-foreground">
         <Buildings size={36} weight="duotone" className="opacity-40" aria-hidden />
-        <p className="text-sm font-medium">{t("Nenhum tenant encontrado")}</p>
-        <p className="max-w-xs text-xs opacity-70">
-          {t("Ajuste os filtros ou crie um novo tenant.")}
+        <p className="text-base font-medium text-foreground">{t("Nenhuma empresa encontrada")}</p>
+        <p className="max-w-xs text-sm">
+          {t("Ajuste os filtros ou cadastre uma empresa cliente.")}
         </p>
       </div>
     );
@@ -158,7 +154,7 @@ export function TenantsTable({
               <TableHead>{t("Nome")}</TableHead>
               <TableHead className="w-[130px]">CNPJ</TableHead>
               <TableHead className="w-[110px]">{t("Status")}</TableHead>
-              <TableHead className="w-[70px] text-right">{t("Users")}</TableHead>
+              <TableHead className="w-[70px] text-right">{t("Usuários")}</TableHead>
               <TableHead className="w-[90px] text-right">{t("Conversas")}</TableHead>
               <TableHead className="w-[90px]">{t("Criado em")}</TableHead>
               <TableHead className="w-[60px]" />
@@ -187,7 +183,8 @@ export function TenantsTable({
                 <TableCell>
                   <Link
                     href={`/admin/tenants/${row.id}`}
-                    className="text-xs font-medium text-accent hover:underline"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    aria-label={`${t("Ver empresa")}: ${row.display_name}`}
                   >
                     {t("Ver")}
                   </Link>
@@ -200,12 +197,7 @@ export function TenantsTable({
 
       {hasNextPage && (
         <div className="flex justify-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onLoadMore}
-            disabled={isFetchingNextPage}
-          >
+          <Button variant="outline" size="sm" onClick={onLoadMore} disabled={isFetchingNextPage}>
             {isFetchingNextPage ? t("Carregando...") : t("Carregar mais")}
           </Button>
         </div>

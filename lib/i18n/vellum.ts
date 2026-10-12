@@ -1,5 +1,13 @@
 /** Textos públicos e financeiros da distribuição Véllum; pt-BR preserva a chave. */
 export const DICIONARIO_VELLUM = {
+  "Buscar empresas": { es: "Buscar empresas" },
+  "Carregando empresas": { es: "Cargando empresas" },
+  "Em configuração": { es: "En configuración" },
+  "Nenhuma empresa encontrada": { es: "No se encontró ninguna empresa" },
+  "Ajuste os filtros ou cadastre uma empresa cliente.": {
+    es: "Ajusta los filtros o registra una empresa cliente.",
+  },
+  "Ver empresa": { es: "Ver empresa" },
   "Cadastros indisponíveis": { es: "Registros no disponibles" },
   "Não foi possível carregar as empresas.": { es: "No se pudieron cargar las empresas." },
   Empresas: { es: "Empresas" },

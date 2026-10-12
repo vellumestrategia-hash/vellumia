@@ -95,6 +95,10 @@ try {
       [],
       "Acessibilidade de preços",
     );
+    if (viewport.width <= 880) {
+      await page.getByRole("button", { name: "Abrir menu de navegação" }).click();
+      await page.getByRole("dialog", { name: "Menu de navegação" }).waitFor();
+    }
     await page.getByRole("link", { name: "Entrar", exact: true }).click();
     await page.waitForURL("**/login", { timeout: 120000 });
     await page.getByLabel("Senha", { exact: true }).waitFor({ timeout: 120000 });
