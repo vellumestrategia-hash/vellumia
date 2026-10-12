@@ -38,7 +38,11 @@ Data: 11/10/2026. Cópia: VellumAI, importação 1c9a46a1.
 - PostgreSQL embarcado valida a migration financeira com o contrato mínimo da base. **Não substitui test:db do baseline PG15 completo**, que exige Docker, nem o E2E com Supabase/serviços reais. Docker está ausente nesta máquina.
 - **Build de produção não concluído**. A tentativa final com Webpack, um worker e heap de 3072 MB foi interrompida quando restavam aproximadamente 70 MB de memória física livre (máquina de 6 GB). Não houve aprovação de build; deve ser repetido em ambiente com recursos suficientes.
 
-Evidências: evidencias/unitarios-final.json, financeiro-ui.json, financeiro-testes.json, validacao-publica.json, typecheck.log, lint-financeiro.log e build-final.log. O contrato financeiro completo desta etapa está em FINANCEIRO.md.
+Evidências: evidencias/unitarios-final.json, financeiro-ui.json, financeiro-testes.json e validacao-publica.json. Logs typecheck.log, lint-financeiro.log e build-final.log permanecem locais, ignorados pelo Git; validacao-local.json registra os resultados. O contrato financeiro completo desta etapa está em FINANCEIRO.md.
+
+## Continuidade no GitHub
+
+O usuário autorizou publicação em vellumestrategia-hash/vellumia. O envio inicial de main foi confirmado no SHA bcd3e285ad3abdbee4270d4ef71fdbc92da896a7. O histórico e a licença foram preservados; arquivos privados, dependências e builds ficaram fora do envio. A preparação passou em 37 testes de marca/workflows, em 7 arquivos, além de parse dos sete workflows e verificação do baseline sincronizado. Build, suíte completa e banco descartável passam a rodar no Actions; consultar os resultados do SHA em revisão. Ver CONTINUIDADE.md e GITHUB.md.
 
 ## Próxima integração necessária
 

@@ -11,7 +11,7 @@ Atualização: 11/10/2026. Pasta de trabalho: VellumAI. Destino autorizado: http
 - Migration 0231 sincronizada com baseline e MANIFEST. PGlite testa a migration com contratos mínimos e RLS de duas empresas.
 - Evidências locais: 418 testes em 40 arquivos selecionados; TypeScript completo aprovado com heap 4096 MB; lint sem erros; Playwright público/Axe aprovado em desktop e celular. Ver RELATORIO.md para limites e evidências.
 - Build local de produção interrompido por pressão de memória; não foi aprovado. Máquina com 6 GB. As verificações completas passam a ser executadas no Actions após o envio.
-- GitHub: workflows de verificação adaptados, automações upstream restritas à origem e configuração Codespaces preparada. Preparação validada com 37 testes em 7 arquivos e parse dos sete workflows. Autenticação CLI concluída com henrriquelealbranco; GitHub ainda retorna viewerPermission READ. Envio depende de conceder escrita à conta ou autenticar uma conta com escrita. Não há execução CI remota comprovada nesta etapa de preparação.
+- GitHub: envio de main confirmado no commit bcd3e285ad3abdbee4270d4ef71fdbc92da896a7; histórico preservado e origin aponta somente para vellumestrategia-hash/vellumia. A conta henrriquelealbranco recebeu WRITE. Workflows de verificação registrados no GitHub; automações upstream restritas à origem e configuração Codespaces preparada. Preparação validada com 37 testes em 7 arquivos, parse dos sete workflows, migration sincronizada e licença intacta. Varredura dos 3978 arquivos versionados não encontrou os sete valores privados presentes no ambiente local. Consultar Actions para o resultado remoto do SHA em revisão; registro de workflow não comprova execução aprovada.
 
 ## Ambiente privado
 
@@ -21,7 +21,7 @@ Faltam SUPABASE_SERVICE_ROLE_KEY e SUPABASE_DB_ADMIN_URL. Asaas sandbox e creden
 
 ## Próxima sequência
 
-1. Concluir autenticação GitHub com escrita, enviar main e conferir SHA remoto. Consultar os checks desse SHA e reparar falhas próprias antes de declarar build/isolamento aprovados.
+1. Consultar os checks no Actions para o SHA em revisão e reparar falhas próprias antes de declarar build/isolamento aprovados. Transferência inicial ao GitHub concluída; não repetir clone nem configurar a origem como remoto de escrita.
 2. Aplicar baseline e bootstrap em ambiente de teste Supabase/PostgreSQL. Executar cadastro, onboarding, MFA e isolamento completo entre duas empresas; obter credenciais privadas por arquivo seguro.
 3. Validar agentes/RAG e atendimento real com provedor IA, número Meta de teste e worker. WAHA é alternativa opcional não oficial.
 4. Homologar Asaas sandbox: contratação, mensalidade/implantação, dois pagamentos, webhook, duplicidade, atraso e estorno. Só então ativar o gate SaaS.
