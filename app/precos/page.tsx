@@ -55,7 +55,7 @@ export default async function PrecosPage() {
             <p>
               A conexão oficial é a WhatsApp Business Platform da Meta, com suas regras de
               consentimento, templates e janela de atendimento. A plataforma também preserva a
-              integração alternativa WAHA, que não é oficial e tem diferenças de suporte,
+              uma integração alternativa não oficial, com diferenças de suporte,
               estabilidade e risco de bloqueio.
             </p>
           </details>
