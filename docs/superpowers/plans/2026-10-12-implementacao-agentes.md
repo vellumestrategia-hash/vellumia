@@ -27,6 +27,8 @@
 
 **Interfaces:** Export `crawlPublicSite(url: string, options?: CrawlOptions): Promise<CrawlResult>` with bounded injected transport for fixtures and secure production transport. `CrawlResult` has `pages: {url,title,text,captured_at,content_hash}[]`, `content_hash`, `warnings: string[]`. Export fact category/schema contracts with snake_case fields: category, key, value, evidence_quote, source_url/source_name, captured_at. Export evidence validation/normalization shared by worker/review. Do not write DB/API/UI in this task.
 
+Category IDs: company, segment, products_services, prices, hours, service_area, contacts, differentiators, payment_methods, policies, commercial_conditions, faq, scheduling. Segment and scheduling explicit allow missing-question logic without parsing opaque keys.
+
 - [ ] Write failing tests for valid collection, private IPv4/IPv6/mapped IP/DNS rebinding/redirects, ports/userinfo, robots allow/disallow, timeout/bytes/pages/depth and duplicate pages. No public network in tests.
 - [ ] Run those files and record RED evidence.
 - [ ] Implement HTTP(S) transport that pins validated DNS results on every hop while retaining normal certificate validation, limits streams and deadlines, honors robots on target paths/origins, and never executes scripts or authentication bypass. Relevant same-origin links only; meaningful text extraction/de-duplication.
