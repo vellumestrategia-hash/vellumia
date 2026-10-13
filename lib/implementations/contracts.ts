@@ -153,3 +153,171 @@ export interface CrawlResult {
   content_hash: string;
   warnings: string[];
 }
+
+/** Interno: tenant, ator, lease e fonte são criados/resolvidos pelo servidor. */
+export const IMPORT_LIMITS = Object.freeze({
+  max_attempts: 3,
+  lease_ms: 240_000,
+  work_ms: 180_000,
+});
+export type ImplementationStatus = "draft" | "review" | "ready";
+export type ImportStatus = "queued" | "running" | "succeeded" | "failed";
+export type IndexStatus = "pending" | "indexing" | "success" | "failed";
+export type FactReviewStatus = "pending" | "approved" | "rejected" | "deleted";
+export interface TestRecord {
+  run_id: string;
+  revision: number;
+  agent_version_id: string;
+  status: string;
+  recorded_at: string;
+}
+export interface ImplementationRecord {
+  id: string;
+  organization_id: string;
+  revision: number;
+  knowledge_revision: number;
+  status: ImplementationStatus;
+  brief: Record<string, unknown>;
+  source_id: string | null;
+  agent_id: string | null;
+  draft_version_id: string | null;
+  approved_revision: number | null;
+  approved_hash: string | null;
+  indexed_revision: number | null;
+  indexed_hash: string | null;
+  index_status: IndexStatus;
+  config_revision: number | null;
+  tested_revision: number | null;
+  finalized_revision: number | null;
+  test_records: TestRecord[];
+  created_at: string;
+  updated_at: string;
+}
+/**
+ * API /api/v1/admin/implementations: GET multitenant full autorizado retorna
+ * ImplementationListItem[] + meta {cursor UUID exclusivo desta listagem, has_more}.
+ * GET /[organizationId] retorna ImplementationDetail; tenant somente do caminho.
+ * POST /[organizationId]: import_site/retry_import retornam {import, duplicate};
+ * review_fact/add_fact/delete_fact/save_brief retornam {implementation, fact?}.
+ * expected_revision protege revisão/fatos/brief; idempotency_key protege import.
+ * review_fact com replace_fact_id faz substituição explícita da mesma category/key.
+ * approved_revision/indexed_revision referem-se a knowledge_revision, não revision.
+ * Brief muda revision/test/finalização; fatos pendentes não mudam nenhuma revisão.
+ * Alteração factual aprovada muda ambas, limpa índice e conserva originais/tombstones.
+ * Implementação 'ready' é preparo; AgentState mantém a publicação/ativação reais.
+ * O union estrito de input/limites está em schemas.ts; nenhum body fornece tenant.
+ */
+export interface FactRecord {
+  id: string;
+  organization_id: string;
+  implementation_id: string;
+  import_id: string | null;
+  category: FactCategory;
+  key: string;
+  original_value: string;
+  original_hash: string;
+  evidence_quote: string | null;
+  source_url: string | null;
+  source_name: string | null;
+  captured_at: string;
+  reviewed_value: string | null;
+  review_status: FactReviewStatus;
+  is_manual: boolean;
+  sensitive_confirmed: boolean;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_note: string | null;
+}
+export interface ImportRecord {
+  id: string;
+  organization_id: string;
+  implementation_id: string;
+  kind: "site" | "file";
+  site_url: string | null;
+  blob_path: string | null;
+  source_name: string | null;
+  requested_by: string;
+  idempotency_key: string;
+  request_hash: string;
+  status: ImportStatus;
+  attempts: number;
+  max_attempts: number;
+  lease_token: string | null;
+  lease_expires_at: string | null;
+  deadline_at: string | null;
+  next_attempt_at: string;
+  content_hash: string | null;
+  error_code: string | null;
+  warnings: string[];
+  created_at: string;
+  updated_at: string;
+}
+export interface CompanyRecord {
+  id: string;
+  display_name: string;
+  slug: string;
+  status: string;
+}
+export interface PlanRecord {
+  plan_id: string;
+  name: string;
+  status: string;
+  setup_paid: boolean;
+}
+export interface AgentState {
+  id: string;
+  name: string;
+  is_active: boolean;
+  published_version_id: string | null;
+  archived_at: string | null;
+}
+export interface ImplementationListItem {
+  company: CompanyRecord;
+  plan: PlanRecord | null;
+  implementation: Pick<ImplementationRecord, "id" | "revision" | "status" | "updated_at"> | null;
+  agents: AgentState[];
+}
+export interface Prerequisite {
+  code: string;
+  status: "present" | "pending";
+}
+export interface ImplementationDetail extends ImplementationListItem {
+  implementation: ImplementationRecord | null;
+  facts: FactRecord[];
+  imports: ImportRecord[];
+  knowledge: {
+    source_id: string | null;
+    approved_revision: number | null;
+    approved_hash: string | null;
+    indexed_revision: number | null;
+    indexed_hash: string | null;
+    index_status: IndexStatus;
+    active_kb_version_id: string | null;
+    source_active: boolean | null;
+    source_status: string | null;
+    last_index_status: string | null;
+  };
+  draft_agent_config: Record<string, unknown> | null;
+  prerequisites: Prerequisite[];
+  test_records: TestRecord[];
+}
+/** source_metadata.implementation é o contrato de commit atômico do indexador (Task 3). */
+export interface ImplementationSourceMetadata {
+  id: string;
+  revision: number;
+  approved_hash: string | null;
+}
+export type ImplementationErrorCode =
+  | "implementation_revision_conflict"
+  | "implementation_sensitive_confirmation_required"
+  | "implementation_lease_lost"
+  | "implementation_import_exhausted"
+  | "idempotency_conflict"
+  | "state_conflict"
+  | "not_found"
+  | "forbidden";
+export class ImplementationError extends Error {
+  constructor(public readonly code: ImplementationErrorCode) {
+    super(code);
+  }
+}

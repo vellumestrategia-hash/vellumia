@@ -286,3 +286,4 @@ To re-apply on a fresh Supabase project, replay the migrations in version order 
 
 | `20260907060000` | `0230_reserva_pre_go_live` | A reserva transacional de novos canais WAHA preserva o pré-go-live da plataforma; retry mantém política e identidade existentes. Forward-fix da integração, sem alterar 0228 aplicada. |
 | `20261012010000` | `0232_vellum_billing` | Planos editáveis, assinaturas sandbox, faturas/eventos idempotentes e janelas por contato com RLS e escrita server-only. Sem backfill histórico. |
+| `20261012160000` | `0233_agent_implementations` | Revisão interna full+MFA, fatos/proveniência imutáveis, imports com lease/slot global, tenancy composta e Storage pendente privado. Revisões de conhecimento e comportamento separadas; não aplica SQL em produção. |

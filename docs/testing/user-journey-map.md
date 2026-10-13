@@ -1984,3 +1984,17 @@ Validação integral do mesmo produto: 733 arquivos unitários / 7.911 casos apr
 Capturas de fixtures da administração: artifact vellum-admin-ui-SHA do E2E; capturas públicas: artifact vellum-publico-SHA do perf. Conferir execução aprovada para o mesmo SHA antes de tratar as provas novas da nuvem como concluídas.
 
 Aceite comprovado em c488914b: CI 38216423478, build/público 38216423578 e E2E 38216423440 aprovados. E2E: 142 + 95 + 55 casos aprovados; a conta exclusiva de plataforma também concluiu a saída e a limpeza. Axe público retornou zero violações nas quatro larguras; sem overflow ou erros JavaScript. Capturas privadas da conta proprietária ficam fora do Git; o CI utiliza dados descartáveis.
+
+## Véllum — implementação interna, etapa 2 de 13/10/2026
+
+| Jornada/limite | Artefato e estado da prova |
+| --- | --- |
+| Administrador global full revisa empresa; cliente/suporte não acessa | API /api/v1/admin/implementations; implementações-routes unitários focados, sem credenciais reais |
+| Site chega como candidato; correção conserva citação e origem | implementations-review unitário; reimportação deduplica inclusive tombstones e captura nova |
+| Preço/horário/política exige confirmação e substituição é explícita | review_fact/add_fact; unitários e checks SQL autorados |
+| Brief invalida comportamento; conteúdo factual alterado retira índice | Revisões separadas e triggers 0233; teste SQL real agent-implementations autorado, execução pendente no Actions |
+| Falha da importação → retry da mesma identidade; contenda não gasta tentativa | Repositório/lease unitários; índice global, tentativas, Storage e RLS aguardam banco descartável do CI |
+| Retorno visível e laço de reparo | DTO e códigos seguros presentes; tela/navegação, worker, sync automático e sandbox nas etapas 3–5, sem prova visual nesta etapa |
+
+Não há alegação de RLS/Storage real aprovada localmente. O relatório da etapa
+registra comandos RED/GREEN, tipos/lint focados e os limites de validação.

@@ -75,6 +75,9 @@ interface Excecao {
  * linhas da OUTRA organização, não uma leitura como superusuário.
  */
 const PROVA_PROPRIA: readonly Excecao[] = [
+  { tabela: "agent_implementations", razao: "tests/invariants/agent-implementations.test.ts — clientes A/B, support e revogado leem zero próprios/cruzados; full lê ambos e MFA aal1/aal2 é provado; DML authenticated negado" },
+  { tabela: "agent_implementation_imports", razao: "tests/invariants/agent-implementations.test.ts — recibos internos com leitura full+MFA e cliente zero A/B; FK composta e slot global/lease/attempts reais" },
+  { tabela: "agent_implementation_facts", razao: "tests/invariants/agent-implementations.test.ts — revisão privada full+MFA com cliente zero A/B; origem imutável, confirmação explícita e invalidação transacional de RAG" },
   { tabela: "billing_subscriptions", razao: "tests/invariants/vellum-billing-rls.test.ts — administradores A/B contam uma assinatura própria e zero cruzadas; atendente não lê e cliente não escreve" },
   { tabela: "billing_invoices", razao: "tests/invariants/vellum-billing-rls.test.ts — leitura positiva local e negativa cruzada A/B por JWT; DML authenticated e leitura anon negados" },
   { tabela: "billing_conversation_windows", razao: "tests/invariants/vellum-billing-rls.test.ts — consumo positivo local e zero cruzado A/B por JWT; leitura atendente e escrita cliente negadas" },

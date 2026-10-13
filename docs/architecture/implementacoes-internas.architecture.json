@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Implementação interna: revisão e persistência",
+    "subtitle": "Etapa 2: API/schema presentes; worker e interface seguem nas próximas etapas",
+    "output": "implementacoes-internas.html",
+    "quality_profile": "standard"
+  },
+  "lanes": [
+    { "id": "api", "label": "API administrativa" },
+    { "id": "db", "label": "Banco e Storage" },
+    { "id": "return", "label": "Retorno observável" }
+  ],
+  "mainPath": ["guard", "repository", "facts", "knowledge", "detail"],
+  "nodes": [
+    {
+      "id": "guard",
+      "lane": "api",
+      "col": 0,
+      "type": "service",
+      "label": "requireImplementationAdmin: full, MFA, sem suporte"
+    },
+    {
+      "id": "repository",
+      "lane": "api",
+      "col": 1,
+      "type": "service",
+      "label": "organization_id do caminho; transaction no pool existente"
+    },
+    {
+      "id": "facts",
+      "lane": "db",
+      "col": 2,
+      "type": "database",
+      "label": "Fatos internos: pending, revisão manual e tombstones"
+    },
+    {
+      "id": "knowledge",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "Approved alterado retira ponteiro RAG/hash atomicamente"
+    },
+    {
+      "id": "queue",
+      "lane": "db",
+      "col": 2,
+      "type": "database",
+      "label": "event_log + import interno; slot único, lease e tentativas finitas"
+    },
+    {
+      "id": "storage",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "ai-policy/implementation-pending privado; upload futuro"
+    },
+    {
+      "id": "audit",
+      "lane": "return",
+      "col": 3,
+      "type": "service",
+      "label": "api_audit_log: operação, ator e empresa"
+    },
+    {
+      "id": "detail",
+      "lane": "return",
+      "col": 4,
+      "type": "service",
+      "label": "DTO: plano/agentes reais, pendência/revisão e erro seguro"
+    }
+  ],
+  "edges": [
+    { "id": "authorize", "from": "guard", "to": "repository", "label": "Escopo global confirmado" },
+    {
+      "id": "review",
+      "from": "repository",
+      "to": "facts",
+      "label": "Correção e substituição explícitas"
+    },
+    {
+      "id": "invalidate",
+      "from": "facts",
+      "to": "knowledge",
+      "label": "Revisão de conhecimento independente do brief"
+    },
+    {
+      "id": "knowledge_status",
+      "from": "knowledge",
+      "to": "detail",
+      "label": "Indexação atual/pendente; guard de commit na Task 3"
+    },
+    {
+      "id": "enqueue",
+      "from": "repository",
+      "to": "queue",
+      "label": "Job + evento no mesmo commit; consumer na Task 3"
+    },
+    {
+      "id": "private",
+      "from": "queue",
+      "to": "storage",
+      "label": "Somente recibo interno do tenant confiável"
+    },
+    {
+      "id": "private_status",
+      "from": "storage",
+      "to": "detail",
+      "label": "Pendência interna, sem fonte customer"
+    },
+    { "id": "receipt", "from": "queue", "to": "detail", "label": "Status e retentativa finita" },
+    {
+      "id": "trail",
+      "from": "repository",
+      "to": "audit",
+      "label": "Audit da mutação sem payload factual"
+    },
+    {
+      "id": "trace",
+      "from": "audit",
+      "to": "guard",
+      "label": "Histórico administrativo existente"
+    },
+    {
+      "id": "feedback",
+      "from": "detail",
+      "to": "guard",
+      "label": "Falha → revisar/retentar; reindexação/reteste nas etapas 3–4"
+    }
+  ]
+}

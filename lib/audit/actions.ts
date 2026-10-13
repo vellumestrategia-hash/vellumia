@@ -459,6 +459,7 @@ export const AUDIT_ACTIONS = [
   "organization.switched",
   "billing.checkout_requested",
   "billing.plan_updated",
+  "agent_implementation.changed",
 ] as const;
 
 /** Um código de auditoria. Derivado de `AUDIT_ACTIONS` — não redigite a lista. */

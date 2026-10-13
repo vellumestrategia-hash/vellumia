@@ -220,3 +220,31 @@ focados, lint direto e TypeScript estrito aprovados, sem rede real, leitura de
 `.env`, banco ou build. Contratos e interfaces do crawler preservados. Evidência e
 limites detalhados em “Fix round 1” do relatório acima; CI integrado permanece
 pendente para o SHA final da funcionalidade.
+
+### Implementação de agentes — etapa 2 de persistência e revisão, 13/10/2026
+
+Implementadas as tabelas internas agent_implementations/imports/facts na
+migration 0233, com baseline/MANIFEST, FKs compostas de tenant, leitura somente
+full/MFA, mutações de servidor e subprefixo Storage privado para imports.
+API administrativa por empresa entrega dados reais de plano/agentes e
+pré-requisitos, com tenant do caminho, body strict, erros seguros e audit.
+Importação idempotente usa event_log existente, transação de enqueue/evento,
+concorrência global um e lease/attempts finitos. Revisão preserva origem e
+tombstones, exige confirmação sensível e substituição explícita.
+
+revision de comportamento é separada de knowledge_revision factual: brief
+invalida teste/config/finalização, mantendo conhecimento inalterado; pending
+não invalida revisões/testes. Alteração aprovada retira pointer/hash da fonte
+atomicamente e publica contrato de revisão/hash para o indexador futuro.
+Fonte inativa/arquivada não satisfaz conhecimento atual mesmo com pointer antigo.
+
+Prova local: 39/39 casos focados de domínio/rotas, TypeScript estrito com
+declarações reais do Next, lint e cinco casos do mapa novo aprovados. Sem
+.env, rede real, banco/Docker, build, suíte completa ou SQL remoto. Invariantes
+de banco/RLS/Storage/lease escritos e registrados na PROVA_PROPRIA, ainda não
+executados: aguardam Actions para o SHA final. RED/GREEN, exports, schema,
+leases e fronteiras em
+`.superpowers/sdd/2026-10-12-implementacao-agentes/task-2-report.md` e contrato
+em `docs/vellum/IMPLEMENTACOES-API.md`. Revisão independente e CI precedem
+a etapa 3: worker/indexação com ativação atômica por revisão/hash. Upload HTTP,
+config/test/finalize e UI não foram antecipados; não há deploy nesta etapa.
