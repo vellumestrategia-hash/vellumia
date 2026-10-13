@@ -77,7 +77,14 @@ export function robotsAllows(policy: RobotsPolicy, url: URL): boolean {
     let retry = 0;
     while (t < path.length) {
       tick();
-      if (p === pattern.length) return !end;
+      if (p === pattern.length) {
+        if (!end) return true;
+        if (star < 0) return false;
+        // Uma ocorrência anterior do sufixo não satisfaz a âncora final.
+        p = star + 1;
+        t = ++retry;
+        continue;
+      }
       if (pattern[p] === "*") {
         star = p++;
         retry = t;

@@ -298,3 +298,120 @@ não existia durante a escrita do relatório:
 ```powershell
 git log -1 --format='%H %s' -- .superpowers/sdd/2026-10-12-implementacao-agentes/task-1-report.md
 ```
+
+## Fix round 1 — revisão P1/P2, 12/10/2026
+
+Base corrigida: `6498cccb7a06de45bbb15a23791cd68f1ce00ca5`.
+Lidos integralmente os dois achados Important de `task-1-review.md`:
+P1, trabalho quadrático do tokenizer antes de `onStartTag`; P2, descarte
+prematuro de wildcard com `$` quando o sufixo ocorre mais de uma vez.
+
+### Correções e decisões
+
+- O tokenizer HTML5 agora é uma subclasse interna da versão fixada de parse5.
+  Conta tentativas de atributo, inclusive duplicatas, por start/end tag e
+  recusa a 129ª tentativa antes de `_createAttr`/`getTokenAttr`. Cada procura
+  linear de duplicata fica restrita a no máximo 128 atributos, em vez de
+  crescer com as 50.000 entradas hostis. O orçamento reinicia em cada tag.
+- Verifica o deadline da coleta e o teto de um segundo do parser nas
+  fronteiras de atributos e a cada 256 consumos do tokenizer, inclusive
+  `_advanceBy`. Isso interrompe também nomes/valores longos antes de emitir
+  a tag. As guardas anteriores de 1 MB, 10.000 callbacks e profundidade 128
+  permanecem. As verificações de tempo não consomem o contador de tokens.
+- O matcher robots, quando chega ao fim do padrão ancorado com texto
+  restante, retoma o último wildcard disponível. A expansão continua no
+  loop com o mesmo orçamento compartilhado de 100.000 comparações; padrões
+  sem wildcard continuam recusando essa tentativa. `/*.php$` agora bloqueia
+  `/private.php/secret.php` e o crawler faz somente o GET de robots.
+- Nenhum contrato/export foi acrescentado ou alterado. `crawlPublicSite`,
+  seu transporte, DNS pinado, limites de coleta e contratos de fatos/evidência
+  conservam suas interfaces. Sem dependência, lockfile, DB, API ou UI novos.
+
+### RED genuíno antes das correções
+
+Quinze casos novos foram adicionados somente ao teste de crawler: tag com
+50.000 atributos distintos; deadlines controlados durante atributos e um
+valor de 50.000 caracteres; duplicatas; controle HTML5 com entidades,
+valores citados e orçamento por tag; oito combinações de âncora/wildcard;
+recusa efetiva do GET; orçamento de expansão ao procurar um sufixo final.
+
+O caso perigoso executa em processo filho com watchdog externo de 5.000 ms,
+`windowsHide:true` e ambiente mínimo (somente SystemRoot). O script importa
+apenas o extrator local, gera HTML de fixture e mede o tempo do parser; não
+carrega setup, `.env`, credenciais nem rede. Assim o RED não bloqueia
+indefinidamente o processo Vitest. Os deadlines controlados avançam Date.now
+uma unidade por verificação, sem depender de sleeps/velocidade do computador.
+
+Comando efetivamente executado (exit 1; log completo no scratch externo):
+
+```powershell
+node node_modules/vitest/vitest.mjs run tests/unit/implementations-crawler.test.ts --maxWorkers=1 --config C:/Users/Lenovo/.codex/tmp/vellum-task-1-vitest.config.mjs --reporter=verbose *> C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-1-red.log; $testExit = $LASTEXITCODE; Get-Content C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-1-red.log | Select-Object -Last 90; exit $testExit
+```
+
+```text
+Test Files  1 failed (1)
+Tests       9 failed | 62 passed (71)
+Start at    21:20:22
+Duration    6.49s (transform 216ms, setup 0ms, import 543ms, tests 5.51s)
+```
+
+Falhas observadas: processo de 50.000 atributos encerrado com ETIMEDOUT após
+5.057 ms de teste; dois deadlines e orçamento de duplicatas não lançavam
+erro; três sufixos repetidos eram permitidos; o crawler coletava a página
+Disallow; a expansão ancorada não atingia o orçamento porque retornava cedo.
+Os controles de sufixo diferente, query, padrão sem wildcard e HTML5 comum
+passaram já no RED. Não houve erro não tratado nem uso de rede real.
+
+### GREEN e verificações focadas
+
+Depois de implementar as duas correções e aplicar Prettier aos três arquivos:
+
+```powershell
+node node_modules/vitest/vitest.mjs run tests/unit/implementations-crawler.test.ts tests/unit/implementations-evidence.test.ts --maxWorkers=1 --config C:/Users/Lenovo/.codex/tmp/vellum-task-1-vitest.config.mjs --reporter=verbose *> C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-1-green.log; $testExit = $LASTEXITCODE; Get-Content C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-1-green.log | Select-Object -Last 30; exit $testExit
+```
+
+```text
+Test Files  2 passed (2)
+Tests       88 passed (88)
+Start at    21:22:43
+Duration    2.78s (transform 238ms, setup 0ms, import 720ms, tests 1.29s)
+```
+
+Exit 0: 71 casos de crawler e 17 de evidência. O teste do subprocesso
+completou em 893 ms incluindo inicialização, e verificou dentro do filho
+`html_complexity_limit` com duração do parser inferior a 1.000 ms. Os dois
+deadlines controlados lançaram `crawl_timeout`; duplicatas lançaram
+`html_complexity_limit`; a expansão ancorada hostil lançou
+`robots_complexity_limit`. DNS, redirects, streams, timeout e evidência
+anteriores continuaram aprovados. Evidência não precisou de alteração.
+
+Lint direto e TypeScript estrito focado: cada comando retornou exit 0, sem
+saída. Usaram as mesmas configurações sem `.env` descritas nesta entrega.
+
+```powershell
+node node_modules/eslint/bin/eslint.js lib/implementations/contracts.ts lib/implementations/public-url.ts lib/implementations/robots.ts lib/implementations/html.ts lib/implementations/crawler.ts tests/unit/implementations-crawler.test.ts tests/unit/implementations-evidence.test.ts
+node node_modules/typescript/bin/tsc --noEmit --project C:/Users/Lenovo/.codex/tmp/vellum-task-1-tsconfig.json
+```
+
+### Self-review e limites desta rodada
+
+Inspecionados os hooks concretos do tokenizer de parse5 8.0.1: `_consume`,
+`_advanceBy`, `_createStartTagToken`, `_createEndTagToken`, `_createAttr` e
+`_leaveAttrName`; as subclasses só atuam antes de chamar os métodos originais.
+O `Parser` é usado para documento completo, de modo que o tokenizer é
+substituído imediatamente após a inicialização, antes de qualquer write.
+Revisados resets por tag, tentativas duplicadas, prioridade de timeout,
+valores citados, texto/entidades e a manutenção do orçamento de robots.
+
+A afirmação histórica de proteção somente por callbacks foi corrigida por
+esta rodada: as guardas agora atuam também no tokenizer, antes da procura
+linear de atributos. Continuam dependentes dos hooks internos da versão
+fixada; atualizar parse5 exige revalidar esses caminhos e regressões. HTML
+com mais de 128 tentativas de atributos por tag é deliberadamente recusado,
+mesmo quando legítimo. O orçamento de robots também pode recusar padrões
+legítimos excessivamente caros, preservando o comportamento fail-closed.
+
+CI completo, rede/TLS real e integração posterior continuam pendentes.
+Não foram executados suíte inteira, build, DB ou push. Nenhum arquivo de
+outra tarefa foi editado. Continuidade registra apenas esta correção da
+etapa 1; os relatórios de revisão permanecem sob controle do coordenador.

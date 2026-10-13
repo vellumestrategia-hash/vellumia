@@ -1,18 +1,68 @@
-import { Parser, type Token, type DefaultTreeAdapterMap } from "parse5";
+import {
+  Parser,
+  Tokenizer,
+  type Token,
+  type DefaultTreeAdapterMap,
+  type TokenizerOptions,
+  type TokenHandler,
+} from "parse5";
 import { normalizeEvidenceText } from "./contracts";
 type HtmlNode = DefaultTreeAdapterMap["node"];
 type Element = DefaultTreeAdapterMap["element"];
-/** parse5 está fixado: os callbacks limitam a árvore antes da inserção de cada token. */
+/** Guardas internas da versão fixada de parse5, antes de acumular atributos/tokens. */
+class BoundedHtmlTokenizer extends Tokenizer {
+  private attributeAttempts = 0;
+  private consumed = 0;
+  constructor(
+    options: TokenizerOptions,
+    handler: TokenHandler,
+    private readonly checkDeadline: () => void,
+  ) {
+    super(options, handler);
+  }
+  override _consume(): number {
+    if (this.consumed++ % 256 === 0) this.checkDeadline();
+    return super._consume();
+  }
+  override _advanceBy(count: number): void {
+    // Mantém checkpoints também nas sequências consumidas fora do loop principal.
+    for (let i = 0; i < count; i++) this._consume();
+  }
+  override _createStartTagToken(): void {
+    this.attributeAttempts = 0;
+    super._createStartTagToken();
+  }
+  override _createEndTagToken(): void {
+    this.attributeAttempts = 0;
+    super._createEndTagToken();
+  }
+  override _createAttr(firstChar: string): void {
+    this.checkDeadline();
+    if (++this.attributeAttempts > 128) throw new Error("html_complexity_limit");
+    super._createAttr(firstChar);
+  }
+  override _leaveAttrName(): void {
+    // parse5 procura duplicatas linearmente em getTokenAttr; a lista já está limitada.
+    this.checkDeadline();
+    super._leaveAttrName();
+  }
+}
+/** Limita a árvore antes da inserção de cada token e o trabalho antes do callback. */
 class BoundedHtmlParser extends Parser<DefaultTreeAdapterMap> {
   private tokens = 0;
   private readonly parserDeadline = Date.now() + 1000;
   constructor(private readonly crawlDeadline: number) {
     super({ scriptingEnabled: false });
+    this.tokenizer = new BoundedHtmlTokenizer(this.options, this, () => this.checkDeadline());
   }
-  private checkpoint(): void {
+  private checkDeadline(): void {
     const now = Date.now();
     if (now >= this.crawlDeadline) throw new Error("crawl_timeout");
-    if (++this.tokens > 10_000 || now >= this.parserDeadline || this.openElements.stackTop >= 128)
+    if (now >= this.parserDeadline) throw new Error("html_complexity_limit");
+  }
+  private checkpoint(): void {
+    this.checkDeadline();
+    if (++this.tokens > 10_000 || this.openElements.stackTop >= 128)
       throw new Error("html_complexity_limit");
   }
   override onStartTag(token: Token.TagToken): void {

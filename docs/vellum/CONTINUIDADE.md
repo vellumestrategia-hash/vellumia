@@ -210,3 +210,13 @@ credencial real, SQL, banco ou build. RED/GREEN, exports e limites em
 CI completo ainda pendente para o SHA final da funcionalidade. Esta etapa não
 implementa fila, persistência, API, indexação, configuração de agente ou UI;
 o próximo trabalho deve consumir estes contratos nos módulos previstos.
+
+Correção da revisão da etapa 1: orçamento de 128 tentativas de atributo por
+tag antes da busca de duplicatas do tokenizer HTML5, com checkpoints de
+deadline durante o consumo; robots retoma wildcard quando um sufixo anterior
+ainda não satisfaz a âncora final. RED reproduziu nove falhas, incluindo a
+tag hostil contida por watchdog externo de cinco segundos. GREEN de 88 casos
+focados, lint direto e TypeScript estrito aprovados, sem rede real, leitura de
+`.env`, banco ou build. Contratos e interfaces do crawler preservados. Evidência e
+limites detalhados em “Fix round 1” do relatório acima; CI integrado permanece
+pendente para o SHA final da funcionalidade.

@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EventEmitter } from "node:events";
 import { PassThrough } from "node:stream";
+import { spawnSync } from "node:child_process";
 import * as http from "node:http";
 import * as https from "node:https";
 import { crawlPublicSite, publicHttpTransport } from "@/lib/implementations/crawler";
@@ -48,6 +49,68 @@ afterEach(() => {
 });
 
 describe("coleta pública limitada", () => {
+  it("recusa prontamente uma única tag com 50 mil atributos distintos", () => {
+    const script = `
+      import { extractPublicHtml } from './lib/implementations/html.ts';
+      const hostile = '<div ' + Array.from({length: 50000}, (_, i) => 'a' + i).join(' ') + '>Public company</div>';
+      const started = Date.now();
+      let error = null;
+      try { extractPublicHtml(hostile, new URL('https://company.example')); }
+      catch (caught) { error = caught.message; }
+      process.stdout.write(JSON.stringify({error, elapsed_ms: Date.now() - started}));
+    `;
+    const result = spawnSync(
+      process.execPath,
+      ["--import", "tsx", "--input-type=module", "-e", script],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        timeout: 5000,
+        windowsHide: true,
+        env: { SystemRoot: process.env.SystemRoot ?? "C:/Windows" },
+      },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout)).toMatchObject({ error: "html_complexity_limit" });
+    expect(JSON.parse(result.stdout).elapsed_ms).toBeLessThan(1000);
+  });
+  it("interrompe a acumulação de atributos no deadline controlado antes de emitir a tag", () => {
+    const hostile = `<div ${Array.from({ length: 2000 }, (_, i) => `a${i}`).join(" ")}>Empresa</div>`;
+    let now = 0;
+    const clock = vi.spyOn(Date, "now").mockImplementation(() => now++);
+    try {
+      expect(() => extractPublicHtml(hostile, new URL(ORIGIN), { deadline_at: 50 })).toThrow(
+        "crawl_timeout",
+      );
+    } finally {
+      clock.mockRestore();
+    }
+  });
+  it("interrompe tokenizer dentro de um valor longo antes do callback da tag", () => {
+    const hostile = `<div title="${"x".repeat(50_000)}">Empresa</div>`;
+    let now = 0;
+    const clock = vi.spyOn(Date, "now").mockImplementation(() => now++);
+    try {
+      expect(() => extractPublicHtml(hostile, new URL(ORIGIN), { deadline_at: 50 })).toThrow(
+        "crawl_timeout",
+      );
+    } finally {
+      clock.mockRestore();
+    }
+  });
+  it("contabiliza tentativas de atributo duplicado no orçamento da tag", () => {
+    expect(() =>
+      extractPublicHtml(`<div ${'a="1" '.repeat(2000)}>Empresa</div>`, new URL(ORIGIN)),
+    ).toThrow("html_complexity_limit");
+  });
+  it("preserva HTML5 com valores citados, entidades e atributos em tags diferentes", () => {
+    const attributes = Array.from({ length: 100 }, (_, i) => `a${i}="${i}"`).join(" ");
+    const page = `<main><div ${attributes} title="${"a=1 ".repeat(2000)}">Empresa &amp; serviços</div><p ${attributes}>Atendimento público</p></main>`;
+    expect(extractPublicHtml(page, new URL(ORIGIN)).text).toBe(
+      "Empresa & serviços\nAtendimento público",
+    );
+  });
   it("recusa HTML excessivamente profundo antes de construir uma árvore hostil", async () => {
     const f = fixture({
       [`${ORIGIN}/`]: html(`${"<div>".repeat(200)}Texto da empresa.${"</div>".repeat(200)}`),
@@ -343,6 +406,37 @@ describe("SSRF e conexão validada", () => {
 });
 
 describe("robots por origem e caminho alvo", () => {
+  it.each([
+    ["/*.php$", "/private.php/secret.php", false],
+    ["/*.php$", "/private.php", false],
+    ["/*.php$", "/private.php/public.html", true],
+    ["/*.php$", "/private.php?modo=publico", true],
+    ["/*secret*.php$", "/secret.php/secret.php", false],
+    ["/private.php$", "/private.php/secret.php", true],
+    ["/private.php$", "/private.php", false],
+    ["/*foo$", "/foo/foofoo", false],
+  ])("respeita a âncora final da regra %s no caminho %s", (rule, path, allowed) => {
+    expect(
+      robotsAllows(parseRobots(`User-agent: *\nDisallow: ${rule}`), new URL(`${ORIGIN}${path}`)),
+    ).toBe(allowed);
+  });
+  it("recusa o GET quando wildcard com sufixo repetido termina em Disallow", async () => {
+    const url = `${ORIGIN}/private.php/secret.php`;
+    const f = fixture(
+      { [url]: html("Informações da empresa.") },
+      "User-agent: *\nDisallow: /*.php$",
+    );
+    const result = await crawlPublicSite(url, f.options);
+    expect(result.pages).toEqual([]);
+    expect(f.requests.map((request) => request.url.pathname)).toEqual(["/robots.txt"]);
+    expect(result.warnings.join(" ")).toContain("robots_disallowed");
+  });
+  it("mantém o orçamento global ao expandir wildcard para procurar sufixo final repetido", () => {
+    const policy = parseRobots(`User-agent: *\nDisallow: /*${"a".repeat(100)}$`);
+    expect(() => robotsAllows(policy, new URL(`${ORIGIN}/${"a".repeat(1500)}b`))).toThrow(
+      "robots_complexity_limit",
+    );
+  });
   it("compara muitos wildcards sem regex nem retrocesso exponencial", () => {
     const policy = parseRobots(`User-agent: *\nDisallow: /${"a*".repeat(500)}z$`);
     expect(robotsAllows(policy, new URL(`${ORIGIN}/${"a".repeat(1000)}`))).toBe(true);
