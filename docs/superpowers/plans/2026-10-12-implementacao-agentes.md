@@ -47,7 +47,7 @@ Category IDs: company, segment, products_services, prices, hours, service_area, 
 - [ ] Implement API actions and safe error codes/messages plus audit. Existing content is never silently replaced on reimport; pending facts are isolated from customer knowledge.
 - [ ] Run focused tests/lint, commit, update continuity. DB tests are authored now but executed later in Actions; never claim local RLS proof.
 
-### Task 3: Jobs, extraction IA et connaissance approuvée
+### Task 3: Jobs, extração com IA e conhecimento aprovado
 
 **Files:** Create `lib/implementations/{import-worker,extract-facts,knowledge}.ts`, `workers/agent-implementation.handler.ts`; modify `lib/event-log/register-handlers.ts`, `lib/agent-engine/edge/llm/run-model-call.ts`, add upload route `app/api/v1/admin/implementations/[organizationId]/upload/route.ts`; unit tests `implementations-worker.test.ts`, `implementations-knowledge.test.ts`.
 
@@ -60,7 +60,7 @@ Category IDs: company, segment, products_services, prices, hours, service_area, 
 - [ ] Implement approved-only index synchronization using existing ai_knowledge_sources/rag-indexer contract and hash. Metadata preserves citations/fact IDs/date. Mutations safely invalidate knowledge revision and tests, prevent stale unapproved content from being available after changes, avoid redundant embeddings.
 - [ ] Run focused tests/lint; commit and update continuity with environment needs and unverified remote status.
 
-### Task 4: Agent commercial, sandbox réel et approbation
+### Task 4: Agente comercial, sandbox real e aprovação
 
 **Files:** Create `lib/implementations/{agent-config,simulation,finalize}.ts`; extend API/schema/contracts; tests `implementations-agent.test.ts`, `implementations-simulation.test.ts`.
 
@@ -73,7 +73,7 @@ Category IDs: company, segment, products_services, prices, hours, service_area, 
 - [ ] Finalize only current approved/indexed knowledge, reviewed draft and successful matching current revision test; record approval, do not auto-publish. Surface actual subscription/Meta/provider prerequisite states and derive Active solely from actual published active agent. Existing publication checks remain intact.
 - [ ] Run focused tests/lint, commit and update continuity.
 
-### Task 5: Interface responsive et central de conhecimento
+### Task 5: Interface responsiva e central de conhecimento
 
 **Files:** Create `app/admin/(protected)/implementations/page.tsx`, `[organizationId]/page.tsx`, `components/admin/implementations/{ImplementationsClient,ImplementationWizard,KnowledgeReview,AgentSetup,AgentSimulation}.tsx` (split further if needed); modify AdminSidebar, add translated keys using existing i18n conventions; UI unit tests `implementations-ui.test.tsx`.
 
@@ -86,7 +86,7 @@ Category IDs: company, segment, products_services, prices, hours, service_area, 
 - [ ] Implement knowledge central approved info, documents/sources/import history/date/index status/reimport/correction/removal/retest. Semantic colors/brand resolution, keyboard labels/focus, useful empty states/mobile layout, no tech details unless a configuration decision is required.
 - [ ] Run focused UI tests/lint, commit and update continuity.
 
-### Task 6: Prova integrada, revisão final et entrega SQL
+### Task 6: Prova integrada, revisão final e entrega SQL
 
 **Files:** Create `tests/e2e/agent-implementation.spec.ts`, extend fixtures and `.github/workflows/e2e.yml` selection/artifacts if needed; docs `docs/vellum/IMPLEMENTACAO-AGENTES.md`, `SQL-MANUAL.md`, `CONTINUIDADE.md`; fix only concrete validation findings in feature files.
 
