@@ -184,3 +184,29 @@ Evidências remotas nos artifacts vellum-publico-c488914b7e1a13109d0db0d696f5d55
 Próxima etapa funcional: configurar/homologar os provedores de IA, os canais e o Asaas sandbox, conforme FINANCEIRO.md. Este refinamento não exigiu SQL novo nem implantação. Atualização posterior somente de documentação não altera o código validado acima.
 
 Ler AGENTS.md e este arquivo, depois RELATORIO.md e FINANCEIRO.md. Conferir `git status`, último commit e resultados do Actions para o mesmo SHA. REQUISITOS.md preserva o briefing inicial; PLANO-TECNICO.md registra a auditoria. Ao fechar uma etapa, atualizar este arquivo com evidência, pendência e próximo passo, sem reproduzir segredos ou afirmar verificações não executadas.
+
+### Implementação de agentes — etapa 1 de coleta e evidência, 12/10/2026
+
+Implementados somente os contratos compartilhados, crawler público, validação
+de URLs/DNS, robots e extração HTML em `lib/implementations/`. Transporte Node
+fixa IP validado por conexão e salto, conserva hostname/TLS, fecha streams e
+respeita seis tentativas de página, profundidade um, quatro redirects por
+cadeia, 1 MB por resposta, 2 MB no total e 90 segundos na coleta inteira.
+HTML e robots têm orçamento de complexidade; scripts e recursos externos não
+são executados. parse5 8.0.1 registrado como dependência de produção com
+pnpm 9.15.9, sem substituir a instalação existente.
+
+Fatos têm categorias compartilhadas, incluindo segmento e agendamento,
+fonte/data e citação verificada de forma extrativa. A validação normaliza
+Unicode/espaços, exige trecho contíguo na fonte enumerada e valor dentro da
+citação, rejeitando atribuição ou data fabricadas. A revisão humana e a
+confirmação comercial continuam necessárias nas próximas etapas.
+
+Prova local: 73 casos em dois arquivos, lint direto e TypeScript estrito apenas
+dos cinco módulos e dois testes, todos aprovados. Configuração temporária de
+Vitest sem setup de ambiente, DNS/HTTP simulados e nenhuma rede pública,
+credencial real, SQL, banco ou build. RED/GREEN, exports e limites em
+`.superpowers/sdd/2026-10-12-implementacao-agentes/task-1-report.md`.
+CI completo ainda pendente para o SHA final da funcionalidade. Esta etapa não
+implementa fila, persistência, API, indexação, configuração de agente ou UI;
+o próximo trabalho deve consumir estes contratos nos módulos previstos.
