@@ -67,7 +67,7 @@ describe("coleta pública limitada", () => {
         encoding: "utf8",
         timeout: 5000,
         windowsHide: true,
-        env: { SystemRoot: process.env.SystemRoot ?? "C:/Windows" },
+        env: { SystemRoot: process.env.SystemRoot ?? "C:/Windows", NODE_ENV: "test" },
       },
     );
     expect(result.error).toBeUndefined();

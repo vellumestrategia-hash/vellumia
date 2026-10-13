@@ -221,6 +221,14 @@ focados, lint direto e TypeScript estrito aprovados, sem rede real, leitura de
 limites detalhados em “Fix round 1” do relatório acima; CI integrado permanece
 pendente para o SHA final da funcionalidade.
 
+Correção CI da etapa 1 em 13/10/2026: o teste de contenção do tokenizer agora
+fornece `NODE_ENV: "test"` no ambiente mínimo do subprocesso, preservando
+SystemRoot e watchdog. TS2769 do run 38327264795 foi reproduzido com
+`next-env.d.ts` real e corrigido; 71 testes do crawler, lint estreito e tsc
+focado com tipos Next passaram. Evidências em “Fix round 2” do relatório.
+Sem alteração de contratos, gerados ou outras etapas; Actions integrado
+continua pendente para o SHA final.
+
 ### Implementação de agentes — etapa 2 de persistência e revisão, 13/10/2026
 
 Implementadas as tabelas internas agent_implementations/imports/facts na

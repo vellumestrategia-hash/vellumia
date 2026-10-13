@@ -415,3 +415,68 @@ CI completo, rede/TLS real e integração posterior continuam pendentes.
 Não foram executados suíte inteira, build, DB ou push. Nenhum arquivo de
 outra tarefa foi editado. Continuidade registra apenas esta correção da
 etapa 1; os relatórios de revisão permanecem sob controle do coordenador.
+
+## Fix round 2 — tipos ambientes Next no teste, 13/10/2026
+
+Base `df991b4d16f509928b0cb41f419cdbba8007cf95`. Achado real informado pelo
+coordenador: Actions run `38327264795`, verify job `115068725884`, sobre
+`b893f470`, falhou com TS2769 em `implementations-crawler.test.ts:70` porque
+o ambiente explícito do subprocesso não fornecia `NODE_ENV`, obrigatório no
+`NodeJS.ProcessEnv` ampliado pelo Next. A configuração focada anterior não
+incluía `next-env.d.ts`, por isso não havia detectado esse conflito.
+
+### RED e correção mínima
+
+Reproduzido localmente antes de editar o teste, usando configuração temporária
+`C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-tsconfig.json`. Ela estende o
+tsconfig real com `incremental:false`, `plugins:[]`, `types:["node"]`,
+`typeRoots` absoluto do node_modules existente, `exclude:[]` e `include`
+somente o teste de crawler e o `next-env.d.ts` real. Seus imports carregam
+os tipos ambientes do Next e os módulos do crawler; sem substituir declarações
+ou rodar o typecheck do repositório inteiro.
+
+```powershell
+node node_modules/typescript/bin/tsc --noEmit --project C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-tsconfig.json *> C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-red.log; $typeExit = $LASTEXITCODE; Get-Content C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-red.log; exit $typeExit
+```
+
+Exit 2, saída RED:
+
+```text
+tests/unit/implementations-crawler.test.ts(70,9): error TS2769: No overload matches this call.
+  Overload 3 of 8, '(command: string, args?: readonly string[] | undefined, options?: SpawnSyncOptions | undefined): SpawnSyncReturns<string | NonSharedBuffer>', gave the following error.
+    Property 'NODE_ENV' is missing in type '{ SystemRoot: string; }' but required in type 'ProcessEnv'.
+```
+
+Única alteração de código: acrescentar `NODE_ENV: "test"` ao objeto `env`
+explícito. Ele continua recebendo somente SystemRoot e esse literal; não há
+spread de process.env, credenciais reais ou leitura de `.env`. Watchdog de
+5.000 ms, windowsHide, HTML hostil de fixture e assertions de contenção
+permanecem iguais. Nenhum export, implementação, dependência ou arquivo
+gerado foi alterado.
+
+### GREEN focado
+
+```powershell
+node node_modules/vitest/vitest.mjs run tests/unit/implementations-crawler.test.ts --maxWorkers=1 --config C:/Users/Lenovo/.codex/tmp/vellum-task-1-vitest.config.mjs --reporter=verbose *> C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-green.log; $testExit = $LASTEXITCODE; Get-Content C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-green.log | Select-Object -Last 12; exit $testExit
+```
+
+```text
+Test Files  1 passed (1)
+Tests       71 passed (71)
+Start at    08:25:01
+Duration    5.03s (transform 302ms, setup 0ms, import 1.66s, tests 2.80s)
+```
+
+Exit 0. Lint estreito e o mesmo TypeScript focado com Next real também
+retornaram exit 0, sem saída:
+
+```powershell
+node node_modules/eslint/bin/eslint.js tests/unit/implementations-crawler.test.ts
+node node_modules/typescript/bin/tsc --noEmit --project C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-tsconfig.json *> C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-types-green.log; $typeExit = $LASTEXITCODE; Get-Content C:/Users/Lenovo/.codex/tmp/vellum-task-1-fix-2-types-green.log; exit $typeExit
+```
+
+Self-review: diff funcional de uma linha, ambiente mínimo e watchdog
+preservados; testes cobrem o subprocesso e os demais caminhos do mesmo
+arquivo. Sem alargar suíte, reinstalar, editar next-env/gerados, build, DB,
+rede real ou push. A nova execução integrada de Actions continua pendente
+para o SHA que incorporar esta correção; GREEN local focado não a substitui.
