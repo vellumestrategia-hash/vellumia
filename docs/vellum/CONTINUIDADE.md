@@ -256,3 +256,17 @@ leases e fronteiras em
 em `docs/vellum/IMPLEMENTACOES-API.md`. Revisão independente e CI precedem
 a etapa 3: worker/indexação com ativação atômica por revisão/hash. Upload HTTP,
 config/test/finalize e UI não foram antecipados; não há deploy nesta etapa.
+
+Revisão da etapa 2, I1: provas SQL de correção e remoção separadas do brief,
+inicializando conhecimento/indexação/teste/finalização atuais antes de cada
+mutação. Quatro casos do repositório real cobrem substituição ausente/incorreta,
+aprovação explícita e rollback na segunda escrita; probes temporários RED
+confirmaram detecção e foram restaurados sem alteração funcional. GREEN local
+de 43/43, tipos com Next e lint aprovados. Provas SQL seguem autoradas, sem
+execução local: Actions pendente. Evidência em “Fix round 1” do relatório da
+etapa 2; nenhum SQL remoto, deploy ou push.
+
+Actions no checkpoint 46feac4f revelou fixture platform_admins sem reason
+obrigatório antes dos casos. As quatro concessões sintéticas agora incluem
+reason explícito e granted_by de auth.users existente; constraints preservadas.
+Nova prova de PostgreSQL aguarda Actions após o commit da correção.

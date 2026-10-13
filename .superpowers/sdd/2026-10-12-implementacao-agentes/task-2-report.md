@@ -222,3 +222,91 @@ typecheck CI da fixture Task 1 (NODE_ENV do subprocesso) é conhecida pelo
 coordenador e será corrigida separadamente; esse arquivo não foi alterado.
 Próximo passo: revisão independente Task 2 e CI/invariantes, depois worker e
 indexador Task 3 com CAS e cancelamento pelo deadline.
+
+## Fix round 1 — I1, provas de substituição e invalidação (13/10/2026)
+
+Base: `46feac4ff36e5e91d5e99d38f5554588d85f89f8`, incluindo a correção de
+fixture da Task 1 aprovada separadamente. A falha NODE_ENV descrita no histórico
+acima não permanece neste checkpoint. I1 foi conferido literalmente: o cenário
+SQL anterior mudava brief antes da correção/remoção, deixando teste/finalização
+e conhecimento já invalidados. Era uma lacuna de prova, sem bug funcional
+confirmado. Nenhum arquivo de produção ou migration foi alterado neste round.
+
+Arquivos cobrindo a correção:
+
+- tests/invariants/agent-implementations.test.ts: brief agora tem caso isolado.
+  Correção e remoção são casos independentes, cada qual em sua transação, com
+  approved/indexed hashes e revisions, source pointer/content hash/index status,
+  config/tested/finalized na revisão corrente imediatamente antes da mutação.
+  Uma precondição SQL exige esse estado completo; cada caso captura as revisões
+  anteriores e verifica incremento de ambas, null de hashes/revisões/gates,
+  index pending/status review, pointer/source hash retirados e metadata com nova
+  knowledge_revision. Também verifica originais e status approved/deleted.
+  Não há mudança de brief entre inicialização e mutação factual.
+- tests/unit/implementations-review.test.ts: quatro casos usam o repositório
+  real mutateImplementation com somente o transporte PG simulado. replace_fact_id
+  ausente/incorreto devolvem state_conflict sem nenhuma escrita de fato e com
+  rollback. ID correto emite rejeição do aprovado antes de aprovação do candidato
+  com binds de org/id/ator/valor/status, e confirma a mesma transação. Falha na
+  segunda escrita emite rollback, não commit nem refresh de metadata.
+- CONTINUIDADE: atualização da evidência para 43 casos e limites mantidos.
+
+RED por mutation probes: comportamento existente passou inicialmente (43/43);
+para provar que a nova cobertura detecta regressão, foram introduzidas somente
+temporariamente três mutações, restaurando repository.ts byte a byte em finally.
+Comando scratch: `& C:/Users/Lenovo/.codex/tmp/vellum-task-2-fix1-mutation-probes.ps1`.
+Cada probe executou o comando seguinte com --testNamePattern específico:
+
+```powershell
+node node_modules/vitest/vitest.mjs run tests/unit/implementations-review.test.ts --maxWorkers=1 --config C:/Users/Lenovo/.codex/tmp/vellum-task-1-vitest.config.mjs --testNamePattern 'substituição com' --reporter=verbose
+```
+
+Sem guards de state_conflict: 2 failed | 28 skipped (30), exit 1,
+“promise resolved ... instead of rejecting”. Sem rejeição anterior (pattern
+'substituição explícita'): 1 failed | 29 skipped, exit 1, esperava duas escritas
+e recebeu uma. Commit no lugar de rollback (pattern 'falha na segunda escrita
+da substituição'): 1 failed | 29 skipped, exit 1, “expected 'commit' to be
+'rollback'”. Logs scratch vellum-task-2-fix1-replacement-{guards,rejection,
+rollback}-red.log. Estes RED são provas de sensibilidade dos novos testes, não
+falhas funcionais alegadas no código entregue. git diff do repositório ficou
+vazio após restauração; nenhuma mutação temporária entra no commit.
+
+GREEN após restauração e ajustes finais de tipos das assertions:
+
+```powershell
+node node_modules/vitest/vitest.mjs run tests/unit/implementations-review.test.ts tests/unit/implementations-routes.test.ts --maxWorkers=1 --config C:/Users/Lenovo/.codex/tmp/vellum-task-1-vitest.config.mjs --reporter=verbose
+node node_modules/typescript/bin/tsc --noEmit --project C:/Users/Lenovo/.codex/tmp/vellum-task-2-tsconfig.json
+node node_modules/eslint/bin/eslint.js tests/unit/implementations-review.test.ts tests/invariants/agent-implementations.test.ts
+```
+
+Resultados: 2 files passed, 43 passed (43), setup 0ms, exit 0, 2.50s
+(vellum-task-2-fix1-green.log). TypeScript focado com next-env.d.ts real exit 0,
+saída vazia (fix1-types.log); lint dos dois arquivos alterados exit 0, saída
+vazia (fix1-lint.log), com prefixo vellum-task-2-. Prettier aplicado aos dois
+arquivos; diff --check aprovado.
+
+Limites: invariantes SQL foram apenas autorados; não executados localmente,
+sem claim de prova PostgreSQL/RLS/atomicidade real. Actions precisa executar os
+casos independentes, incluindo os triggers de produção. Driver tests verificam
+decisões/SQL/binds/commit/rollback, não o funcionamento de PostgreSQL. Sem DB,
+Docker, .env, segredos, rede, build, suítes completas, deploy ou push. Escopo
+restrito a I1 e à fixture CI solicitada abaixo; produto preservado.
+
+### Correção adicional da fixture CI no mesmo round
+
+RED real informado pelo coordenador: Actions run 38390583193, invariants job
+115273108848, checkpoint 46feac4f. O beforeAll desta suite falhou antes dos casos:
+`null value in column reason violates not-null constraint`, psql linha 9,
+seed de platform_admins. Não é falha funcional do produto nem resultado local.
+Incluído reason explícito e legível nas quatro fixtures full/support/revoked/MFA.
+Conferência focada: baseline.sql:1768 exige user_id/granted_by/reason não nulos,
+scope permite full/support_readonly; :3868 liga granted_by a auth.users com
+ON DELETE RESTRICT. auth.users é semeado antes e todos os granted_by apontam
+para o usuário full existente, inclusive bootstrap self-grant usado também por
+organizacoes-criacao-e-convite.test.ts:11. Sem constraint alterada e sem uso de
+administrador real. Correção PostgreSQL aguarda nova execução Actions. Os mesmos
+comandos focados de tipos e lint acima foram executados após esse ajuste:
+ambos exit 0, saída vazia, logs vellum-task-2-fix1-ci-fixture-types.log e
+vellum-task-2-fix1-ci-fixture-lint.log. Sem DB local; a suite unitária permanece
+43/43 no GREEN anterior, pois a alteração posterior está apenas no seed SQL
+não executado localmente.

@@ -46,6 +46,22 @@ function denied(script: string, reason = /permission denied|row-level security/)
   expect(failure).toBeDefined();
   expect(motivoDoErro(failure)).toMatch(reason);
 }
+function seedCurrentApprovedKnowledge() {
+  return `update public.agent_implementation_facts set reviewed_value='A',review_status='approved',reviewed_by='${full}',reviewed_at=now() where organization_id='${orgA}' and id='${factA}';
+    update public.agent_implementations set source_id='${sourceA}',approved_hash=repeat('a',64),approved_revision=knowledge_revision,
+      indexed_hash=repeat('a',64),indexed_revision=knowledge_revision,index_status='success',config_revision=revision,tested_revision=revision,finalized_revision=revision,status='ready' where organization_id='${orgA}';
+    update public.ai_knowledge_sources s set active_kb_version_id='${version}',last_index_status='success',last_indexed_at=now(),chunks_count=1,
+      source_metadata=jsonb_build_object('content_hash',repeat('a',64),'implementation',jsonb_build_object('id','${implA}','revision',i.knowledge_revision,'approved_hash',repeat('a',64)))
+      from public.agent_implementations i where s.organization_id='${orgA}' and s.id='${sourceA}' and i.organization_id=s.organization_id and i.id='${implA}';
+    do $seed$ begin
+      if not exists(select 1 from public.agent_implementations i join public.ai_knowledge_sources s on s.id=i.source_id and s.organization_id=i.organization_id where i.organization_id='${orgA}'
+        and i.status='ready' and i.config_revision=i.revision and i.tested_revision=i.revision and i.finalized_revision=i.revision
+        and i.approved_revision=i.knowledge_revision and i.indexed_revision=i.knowledge_revision and i.index_status='success'
+        and i.approved_hash=repeat('a',64) and i.indexed_hash=repeat('a',64) and s.active_kb_version_id='${version}'
+        and s.last_index_status='success' and s.last_indexed_at is not null and s.chunks_count=1
+        and s.source_metadata->>'content_hash'=repeat('a',64) and s.source_metadata->'implementation'->>'approved_hash'=repeat('a',64)) then raise exception 'current approved/indexed/tested/finalized seed missing'; end if;
+    end $seed$;`;
+}
 beforeAll(() => {
   sql(`insert into public.organizations(id,slug,legal_name,display_name) values
     ('${orgA}','implementation-invariant-a','Implementation A','Implementation A'),
@@ -53,9 +69,11 @@ beforeAll(() => {
     insert into auth.users(id,email) values ${[customerA, customerB, full, support, revoked, mfa].map((id, i) => `('${id}','implementation-${i}@invariant.test')`).join(",")};
     insert into public.user_organizations(user_id,organization_id,role,accepted_at) values
     ('${customerA}','${orgA}','admin',now()),('${customerB}','${orgB}','admin',now());
-    insert into public.platform_admins(user_id,scope,mfa_required,granted_by,revoked_at) values
-    ('${full}','full',false,'${full}',null),('${support}','support_readonly',false,'${full}',null),
-    ('${revoked}','full',false,'${full}',now()),('${mfa}','full',true,'${full}',null);
+    insert into public.platform_admins(user_id,scope,mfa_required,granted_by,revoked_at,reason) values
+    ('${full}','full',false,'${full}',null,'Invariant 0233 full-global reader'),
+    ('${support}','support_readonly',false,'${full}',null,'Invariant 0233 support denied'),
+    ('${revoked}','full',false,'${full}',now(),'Invariant 0233 revoked admin denied'),
+    ('${mfa}','full',true,'${full}',null,'Invariant 0233 MFA assurance required');
     insert into public.agent_implementations(id,organization_id) values ('${implA}','${orgA}'),('${implB}','${orgB}');
     insert into public.agent_implementation_imports(id,organization_id,implementation_id,kind,site_url,requested_by,idempotency_key,request_hash) values
     ('${jobA}','${orgA}','${implA}','site','https://example.com/','${full}','${jobA}',repeat('a',64)),
@@ -186,28 +204,45 @@ describe("0233: implementação interna, isolamento e MFA no banco real", () => 
       ),
     ).toBe("2");
   });
-  it("aprovar/corrigir/remove limpa ponteiro RAG e revisões de teste na mesma transação; brief preserva conhecimento", () => {
+  it("brief invalida comportamento e preserva conhecimento aprovado inalterado", () => {
     sql(`begin; set role service_role;
-      update public.agent_implementation_facts set reviewed_value='A',review_status='approved',reviewed_by='${full}',reviewed_at=now() where organization_id='${orgA}' and id='${factA}';
-      update public.agent_implementations set source_id='${sourceA}',approved_hash=repeat('a',64),approved_revision=knowledge_revision,
-        indexed_hash=repeat('a',64),indexed_revision=knowledge_revision,index_status='success',tested_revision=revision,finalized_revision=revision,status='ready' where organization_id='${orgA}';
-      update public.ai_knowledge_sources set active_kb_version_id='${version}',source_metadata=jsonb_build_object('implementation',jsonb_build_object('id','${implA}','revision',2,'approved_hash',repeat('a',64))) where organization_id='${orgA}' and id='${sourceA}';
+      ${seedCurrentApprovedKnowledge()}
       update public.agent_implementations set brief='{"purpose":"Atender"}' where organization_id='${orgA}';
       do $proof$ begin
         if not exists(select 1 from public.agent_implementations i join public.ai_knowledge_sources s on s.id=i.source_id and s.organization_id=i.organization_id where i.organization_id='${orgA}'
           and i.tested_revision is null and i.finalized_revision is null and i.indexed_hash=repeat('a',64) and s.active_kb_version_id='${version}') then raise exception 'brief lost unchanged knowledge'; end if;
       end $proof$;
-      update public.agent_implementation_facts set reviewed_value='Corrigido',is_manual=true where organization_id='${orgA}' and id='${factA}';
-      do $proof$ begin
-        if not exists(select 1 from public.agent_implementations i join public.ai_knowledge_sources s on s.id=i.source_id and s.organization_id=i.organization_id where i.organization_id='${orgA}'
-          and i.approved_hash is null and i.indexed_hash is null and i.tested_revision is null and i.finalized_revision is null and s.active_kb_version_id is null
-          and s.source_metadata->'implementation'->>'approved_hash' is null) then raise exception 'stale source'; end if;
-        if not exists(select 1 from public.agent_implementation_facts where id='${factA}' and original_value='A' and evidence_quote='Empresa A de teste') then raise exception 'original lost'; end if;
-      end $proof$;
-      update public.agent_implementation_facts set review_status='deleted' where organization_id='${orgA}' and id='${factA}';
-      do $proof$ begin if not exists(select 1 from public.agent_implementation_facts where id='${factA}' and review_status='deleted') then raise exception 'tombstone lost'; end if; end $proof$;
       rollback;`);
   });
+  it.each([
+    {
+      mutation: "correção",
+      changes: "reviewed_value='Corrigido',is_manual=true",
+      status: "approved",
+    },
+    { mutation: "remoção", changes: "review_status='deleted'", status: "deleted" },
+  ])(
+    "$mutation de fato aprovado invalida revisões/hash/ponteiro previamente atuais",
+    ({ changes, status }) => {
+      sql(`begin; set role service_role;
+      ${seedCurrentApprovedKnowledge()}
+      do $proof$ declare prior_revision integer; prior_knowledge_revision integer; begin
+        select revision,knowledge_revision into strict prior_revision,prior_knowledge_revision from public.agent_implementations where organization_id='${orgA}' and id='${implA}';
+        update public.agent_implementation_facts set ${changes} where organization_id='${orgA}' and implementation_id='${implA}' and id='${factA}';
+        if not exists(select 1 from public.agent_implementations i join public.ai_knowledge_sources s on s.id=i.source_id and s.organization_id=i.organization_id where i.organization_id='${orgA}'
+          and i.revision=prior_revision+1 and i.knowledge_revision=prior_knowledge_revision+1 and i.status='review'
+          and i.approved_hash is null and i.approved_revision is null and i.indexed_hash is null and i.indexed_revision is null and i.index_status='pending'
+          and i.config_revision is null and i.tested_revision is null and i.finalized_revision is null and s.active_kb_version_id is null
+          and s.last_index_status is null and s.last_indexed_at is null and s.chunks_count=0 and not(s.source_metadata ? 'content_hash')
+          and s.source_metadata->'implementation'->>'id'='${implA}'
+          and (s.source_metadata->'implementation'->>'revision')::integer=prior_knowledge_revision+1
+          and s.source_metadata->'implementation'->>'approved_hash' is null) then raise exception 'approved fact mutation left stale current state'; end if;
+        if not exists(select 1 from public.agent_implementation_facts where organization_id='${orgA}' and id='${factA}' and review_status='${status}'
+          and original_value='A' and evidence_quote='Empresa A de teste' and original_hash=repeat('a',64)) then raise exception 'original/tombstone lost'; end if;
+      end $proof$;
+      rollback;`);
+    },
+  );
   it("fato pendente e recusa preservam revisão/teste já aprovado", () => {
     sql(`begin; set role service_role;
       update public.agent_implementations set tested_revision=revision where organization_id='${orgA}';

@@ -228,6 +228,128 @@ describe("implementations repository: transaction e lease", () => {
     approved_hash: null,
     source_id: null,
   };
+  const previousApproved: FactRecord = {
+    ...fact,
+    id: "aaaaaaaa-0000-4000-8000-000000000004",
+    reviewed_value: "9h",
+    review_status: "approved",
+    sensitive_confirmed: true,
+    reviewed_by: actor,
+    reviewed_at: captured_at,
+  };
+  const replacement: FactRecord = {
+    ...fact,
+    original_value: "10h",
+    original_hash: "candidate-hash",
+    evidence_quote: "Atendemos a partir das 10h",
+  };
+  const replacementApproved: FactRecord = {
+    ...replacement,
+    reviewed_value: "10h",
+    review_status: "approved",
+    sensitive_confirmed: true,
+    reviewed_by: actor,
+    reviewed_at: captured_at,
+  };
+  function replacementDriver(failCandidateWrite = false) {
+    let factReads = 0;
+    return driver((sql) => {
+      if (sql.includes("select id from public.organizations")) return [{ id: org }];
+      if (sql.includes("select * from public.agent_implementations")) return [implementation];
+      if (sql.includes("select * from public.agent_implementation_facts"))
+        return factReads++ === 0
+          ? [previousApproved, replacement]
+          : [{ ...previousApproved, review_status: "rejected" }, replacementApproved];
+      if (sql.startsWith("update public.agent_implementation_facts set reviewed_value=")) {
+        if (failCandidateWrite) throw new Error("candidate write failed");
+        return [replacementApproved];
+      }
+      if (sql.startsWith("update public.agent_implementations set approved_hash="))
+        return [implementation];
+      return [];
+    });
+  }
+  const replacementAction = {
+    action: "review_fact" as const,
+    fact_id: replacement.id,
+    expected_revision: 1,
+    disposition: "approved" as const,
+    sensitive_confirmed: true,
+  };
+  it.each([
+    { label: "ausente", replace_fact_id: undefined },
+    { label: "incorreto", replace_fact_id: "aaaaaaaa-0000-4000-8000-000000000005" },
+  ])(
+    "substituição com replace_fact_id $label retorna conflito sem escrever fatos",
+    async ({ replace_fact_id }) => {
+      const statements = replacementDriver();
+      await expect(
+        mutateImplementation(org, actor, { ...replacementAction, replace_fact_id }),
+      ).rejects.toThrow("state_conflict");
+      expect(
+        statements.filter((s) =>
+          /^(update|insert into|delete from) public\.agent_implementation_facts/.test(s.sql),
+        ),
+      ).toEqual([]);
+      expect(statements.at(-1)?.sql).toBe("rollback");
+      expect(statements.some((s) => s.sql === "commit")).toBe(false);
+    },
+  );
+  it("substituição explícita rejeita o aprovado antes de aprovar o candidato e confirmar", async () => {
+    const statements = replacementDriver();
+    const result = await mutateImplementation(org, actor, {
+      ...replacementAction,
+      replace_fact_id: previousApproved.id,
+    });
+    const writes = statements.filter((s) =>
+      s.sql.startsWith("update public.agent_implementation_facts"),
+    );
+    expect(writes).toHaveLength(2);
+    expect(writes[0]?.sql).toContain("review_status='rejected'");
+    expect(writes[0]?.values).toEqual([org, previousApproved.id, actor, expect.any(String)]);
+    expect(writes[1]?.values).toEqual([
+      org,
+      replacement.id,
+      "10h",
+      "approved",
+      false,
+      true,
+      actor,
+      expect.any(String),
+      null,
+      id,
+    ]);
+    expect(result).toMatchObject({
+      fact: {
+        id: replacement.id,
+        original_value: "10h",
+        reviewed_value: "10h",
+        review_status: "approved",
+      },
+    });
+    expect(statements[0]?.sql).toBe("begin");
+    expect(statements.at(-1)?.sql).toBe("commit");
+    expect(statements.some((s) => s.sql === "rollback")).toBe(false);
+  });
+  it("falha na segunda escrita da substituição desfaz a rejeição anterior", async () => {
+    const statements = replacementDriver(true);
+    await expect(
+      mutateImplementation(org, actor, {
+        ...replacementAction,
+        replace_fact_id: previousApproved.id,
+      }),
+    ).rejects.toThrow("candidate write failed");
+    expect(
+      statements.filter((s) => s.sql.startsWith("update public.agent_implementation_facts")),
+    ).toHaveLength(2);
+    expect(statements.at(-1)?.sql).toBe("rollback");
+    expect(statements.some((s) => s.sql === "commit")).toBe(false);
+    expect(
+      statements.some((s) =>
+        s.sql.startsWith("update public.agent_implementations set approved_hash="),
+      ),
+    ).toBe(false);
+  });
   it("enqueue e event são confirmados juntos; repetição devolve import existente", async () => {
     let job: Record<string, unknown> | undefined;
     const statements = driver((sql, values) => {
